@@ -1,31 +1,65 @@
 #!usr/bin/env python3
 
+import os
+
 #library
+
+userCMD = {
+    "baseCMD" : "",
+    "fileRequested" : "",
+    "filePath" : "",
+    "isRecursive" : False
+}
+
+#input: commands - string that user types in REPL
+#output: userCMD - dictionary with information about the command
+def replParse(commands):
+    pass
 
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
 def doesExist(pathString):
-    pass
+    if(os.path.exist(pathString) and os.access(pathString, os.R_OK)):
+        return True;
+    else:
+        return False;
 
 # input: pathString - file to covert to []byte
 # return:  []byte data of file
 def fileToByte(file):
-    pass
+    if(doesExist(file) == True){
+        file = open(file, "r")
+        fileContents = file.read()
+        buffer = bytes(fileContents)
+        return buffer
+    }else{
+        print('File does not exist')
+        return False;
+    }
 
 # input: path - path to return directory from
 # return: string - directory where the file resides
 def returnDirectory(path):
-    pass
+    return os.path.dirname(path)
 
 # input: path - where to create directory
 # return: bool - success
 def createDirectory(path):
-    pass
+    if(doesExist == False):
+        os.mkdirs(path)
+        return True
+    else:
+        return False
 
 # input: buffer - recieved buffer; filePath - where to create file
-# return: bool - true or false if the file exist
+# return: bool - success
 def bufferToFile(buffer, filePath):
-    pass
+    if(doesExist(filePath)):
+        file = open("file", "wb")
+        file.write(buffer)
+    else:
+        return False
+
 
 # input: path - path to the file string
 # return: bool - file created successfully
