@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 import os
 import subprocess
@@ -28,15 +28,15 @@ def doesExist(pathString):
 # input: pathString - file to covert to []byte
 # return:  []byte data of file
 def fileToByte(file):
-    if(doesExist(file) == True){
+    if(doesExist(file) == True):
         file = open(file, "r")
         fileContents = file.read()
         buffer = bytes(fileContents)
         return buffer
-    }else{
+    else:
         print('File does not exist')
-        return False;
-    }
+        return False
+    
 
 # input: path - path to return directory from
 # return: string - directory where the file resides
@@ -65,7 +65,7 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = os.system(commandString);
+    ret = os.system(commandString)
     return ret
 
 # input: filePath
