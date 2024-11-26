@@ -37,7 +37,7 @@ def main():
     print(itDoesntExist) #should print false
 
     #testing fileToByte(file)
-    file = "test.txt"
+    file = "/Users/user/Documents/GitHub/SFTP-Clone-CPSC-328-Section-020/test.txt"
     byteFile = library.fileToByte(file)
     print(type(byteFile))
 

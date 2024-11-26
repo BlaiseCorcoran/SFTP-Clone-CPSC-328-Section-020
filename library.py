@@ -20,7 +20,7 @@ def replParse(commands):
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
 def doesExist(pathString):
-    if(os.path.exist(pathString) and os.access(pathString, os.R_OK)):
+    if(os.path.isdir(pathString) and os.access(pathString, os.R_OK)):
         return True
     else:
         return False
@@ -28,10 +28,10 @@ def doesExist(pathString):
 # input: pathString - file to covert to []byte
 # return:  []byte data of file
 def fileToByte(file):
-    if(doesExist(file) == True):
+    if(os.path.isfile(file) == True):
         file = open(file, "r")
         fileContents = file.read()
-        buffer = bytes(fileContents)
+        buffer = bytes(fileContents.encode())
         return buffer
     else:
         print('File does not exist')
@@ -46,8 +46,8 @@ def returnDirectory(path):
 # input: path - where to create directory
 # return: bool - success
 def createDirectory(path):
-    if(doesExist == False):
-        os.mkdirs(path)
+    if(doesExist(path) == False):
+        os.mkdir(path)
         return True
     else:
         return False
