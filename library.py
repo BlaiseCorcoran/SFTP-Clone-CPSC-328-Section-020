@@ -1,6 +1,7 @@
 #!usr/bin/env python3
 
 import os
+import subprocess
 
 #library
 
@@ -61,15 +62,11 @@ def bufferToFile(buffer, filePath):
         return False
 
 
-# input: path - path to the file string
-# return: bool - file created successfully
-def createFile(path):
-    pass
-
 # input: commandString - command to execute
-# return: int - return value of execution
+# return: string - return of execution
 def execBash(commandString):
-    pass
+    ret = os.system(commandString);
+    return ret
 
 # input: filePath
 # return: string - bash commands to copy directory
