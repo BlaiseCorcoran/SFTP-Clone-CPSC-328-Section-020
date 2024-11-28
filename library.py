@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 import os
 import subprocess
@@ -87,7 +87,7 @@ def replParse(userCommandString):
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
 def doesExist(pathString):
-    if(os.path.exist(pathString) and os.access(pathString, os.R_OK)):
+    if(os.path.isdir(pathString) and os.access(pathString, os.R_OK)):
         return True
     else:
         return False
@@ -95,15 +95,15 @@ def doesExist(pathString):
 # input: pathString - file to covert to []byte
 # return:  []byte data of file
 def fileToByte(file):
-    if(doesExist(file) == True){
+    if(os.path.isfile(file) == True):
         file = open(file, "r")
         fileContents = file.read()
-        buffer = bytes(fileContents)
+        buffer = bytes(fileContents.encode())
         return buffer
-    }else{
+    else:
         print('File does not exist')
-        return False;
-    }
+        return False
+    
 
 # input: path - path to return directory from
 # return: string - directory where the file resides
@@ -113,8 +113,8 @@ def returnDirectory(path):
 # input: path - where to create directory
 # return: bool - success
 def createDirectory(path):
-    if(doesExist == False):
-        os.mkdirs(path)
+    if(doesExist(path) == False):
+        os.mkdir(path)
         return True
     else:
         return False
@@ -132,7 +132,7 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = os.system(commandString);
+    ret = os.system(commandString)
     return ret
 
 # input: filePath
