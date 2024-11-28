@@ -20,7 +20,7 @@ def replParse(commands):
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
 def doesExist(pathString):
-    if(os.path.exist(pathString) and os.access(pathString, os.R_OK)):
+    if((os.path.isdir(pathString) or os.path.isfile(pathString)) and os.access(pathString, os.R_OK)):
         return True
     else:
         return False
@@ -65,13 +65,25 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = os.system(commandString);
+    ret = os.system(commandString)
     return ret
 
-# input: filePath
+# input: filePath; commandBuild string use empty string; right 
 # return: string - bash commands to copy directory
 def directoryCopy(filePath):
-    pass
+    commandBuild = ""
+    if(not doesExist):
+        return NULL
+    for root, dirs, files in os.walk(".", topdowm=True):
+        for name in dirs:
+            commandBuild += "mkdir " + root + name + ";"
+        for name in files:
+            commandBuild += "touch" + root + name
+            fileData = fileToByte(name)
+            fileData = str(fileData)
+            commandBuild += "echo " + fileData + " > " + root+name + ";"
+        return commandBuild
+
 
 def main():
     pass
