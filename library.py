@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 import os
 import subprocess
@@ -12,15 +12,82 @@ userCMD = {
     "isRecursive" : False
 }
 
+
+
 #input: commands - string that user types in REPL
 #output: userCMD - dictionary with information about the command
-def replParse(commands):
+
+#name: replParse
+#purpose: parses the Read-Eval-Print loop user arguments.
+#when requesting or sending files the fileRequested value is used
+#when changing or listing directories the filePath value is used
+#for certain commands where the default dir is the current dir, instead
+#of being left blank the filePath will be './'
+#return value: returns a userCMD dictionary containing the values.
+def replParse(userCommandString):
+    retval = userCMD
+    commandArgs = userCommandString.rsplit(" ")
+    retval["baseCMD"] = commandArgs[0]
+    baseCommand = retval["baseCMD"]
+    #no match statement acad's python3 is too old :'(
+    if baseCommand == "exit" :
+        return retval
+    elif baseCommand == "cd" :
+        retval["fileRequested"] = commandArgs[1]
+        return retval
+    elif baseCommand == "get" :
+        if commandArgs.count("-R") > 0:
+            commandArgs.remove("-R")
+            retval["isRecursive"] = True
+        retval["fileRequested"] = commandArgs[1]
+        if len(commandArgs) > 2 :
+            retval["filePath"] = commandArgs[2]
+        return retval
+    elif baseCommand == "help" :
+        return retval
+    elif baseCommand == "lcd" :
+        if len(commandArgs) > 1:
+            retval["filePath"] = commandArgs[1]
+            return retval
+        else:
+            return retval
+    elif baseCommand == "lls" :
+        if len(commandArgs > 1) :
+            retval["filePath"] = commandArgs[1]
+            return retval
+        else :
+            return retval
+    elif baseCommand == "lmkdir" :
+        retval["filePath"] = commandArgs[1]
+        return retval
+    elif baseCommand == "lpwd" :
+        return retval
+    elif baseCommand == "ls" :
+        if len(commandArgs > 1) :
+            retval["filePath"] = commandArgs[1]
+            return retval
+        else :
+            retval["filePath"] = "./"
+            return retval
+    elif baseCommand == "mkdir":
+        retval["filePath"] = commandArgs[1]
+        return retval
+    elif baseCommand == "put":
+        if(commandArgs.count("-R") > 0) :
+            commandArgs.remove("-R")
+            retval["isRecursive"] = True
+        retval["fileRequested"] = commandArgs[1]
+        if len(commandArgs) > 2:
+            retval["filePath"] = commandArgs[2]
+        return retval
+    elif baseCommand == "pwd":
+        return retval
     pass
 
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
 def doesExist(pathString):
-    if((os.path.isdir(pathString) or os.path.isfile(pathString)) and os.access(pathString, os.R_OK)):
+    if(os.path.isdir(pathString) and os.access(pathString, os.R_OK)):
         return True
     else:
         return False
@@ -28,15 +95,15 @@ def doesExist(pathString):
 # input: pathString - file to covert to []byte
 # return:  []byte data of file
 def fileToByte(file):
-    if(doesExist(file) == True){
+    if(os.path.isfile(file) == True):
         file = open(file, "r")
         fileContents = file.read()
-        buffer = bytes(fileContents)
+        buffer = bytes(fileContents.encode())
         return buffer
-    }else{
+    else:
         print('File does not exist')
-        return False;
-    }
+        return False
+    
 
 # input: path - path to return directory from
 # return: string - directory where the file resides
@@ -46,8 +113,8 @@ def returnDirectory(path):
 # input: path - where to create directory
 # return: bool - success
 def createDirectory(path):
-    if(doesExist == False):
-        os.mkdirs(path)
+    if(doesExist(path) == False):
+        os.mkdir(path)
         return True
     else:
         return False
