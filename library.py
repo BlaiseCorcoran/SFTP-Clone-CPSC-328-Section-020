@@ -141,15 +141,17 @@ def directoryCopy(filePath):
     commandBuild = ""
     if(not doesExist):
         return NULL
-    for root, dirs, files in os.walk(".", topdowm=True):
+    for root, dirs, files in os.walk(filePath):
         for name in dirs:
-            commandBuild += "mkdir " + root + name + ";"
+            dirPath = os.path.join(root, name)
+            commandBuild += f"mkdir -p '{dirPath}';\n" 
         for name in files:
-            commandBuild += "touch" + root + name
-            fileData = fileToByte(name)
-            fileData = str(fileData)
-            commandBuild += "echo " + fileData + " > " + root+name + ";"
-        return commandBuild
+            pathFile = os.path.join(root, name)
+            filebytes = str(fileToByte(pathFile))
+            fileString= filebytes.replace("'", "'\\''")  # Escape single quotes for shell
+            commandBuild += f"echo '{fileString}' > '{pathFile}';\n" 
+
+    return commandBuild
 
 
 def main():

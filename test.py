@@ -55,6 +55,9 @@ def main():
     #testing execBash(commandString)
     library.execBash("pwd") 
 
+    directorycopy = library.directoryCopy("planning")
+    fullCMD = "cd cpinto; " + str(directorycopy)
+    library.execBash(fullCMD)
 
     #testing directoryCopy(filePath)
     #not yet implemented
