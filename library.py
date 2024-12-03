@@ -92,8 +92,11 @@ def doesExist(pathString):
     else:
         return False
 
+
+#name: fileToByte
 # input: pathString - file to covert to []byte
 # return:  []byte data of file
+#purpose: convert a file to a byte
 def fileToByte(file):
     if(os.path.isfile(file) == True):
         file = open(file, "r")
@@ -105,13 +108,17 @@ def fileToByte(file):
         return False
     
 
+# name returnDirectory
 # input: path - path to return directory from
 # return: string - directory where the file resides
+# purpose: returns directory position
 def returnDirectory(path):
     return os.path.dirname(path)
 
+# name: createDirectory
 # input: path - where to create directory
 # return: bool - success
+# purpose: create a directory
 def createDirectory(path):
     if(doesExist(path) == False):
         os.mkdir(path)
@@ -119,8 +126,10 @@ def createDirectory(path):
     else:
         return False
 
+# name: bufferToFile
 # input: buffer - recieved buffer; filePath - where to create file
 # return: bool - success
+# purpose: to output the buffer to a file
 def bufferToFile(buffer, filePath):
     if(not doesExist(filePath)):
         file = open("file", "wb")
@@ -129,14 +138,18 @@ def bufferToFile(buffer, filePath):
         return False
 
 
+# name: execBash
 # input: commandString - command to execute
 # return: string - return of execution
+# purpose: execute a bash statement
 def execBash(commandString):
     ret = os.system(commandString)
     return ret
 
+# name: directoryCopy
 # input: filePath; commandBuild string use empty string; right 
 # return: string - bash commands to copy directory
+# purpose: create a list of bash commands that executed on a foriegn system will paste a directory
 def directoryCopy(filePath):
     commandBuild = ""
     if(not doesExist):

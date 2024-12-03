@@ -4,6 +4,10 @@ import argparse
 import library
 
 #client
+
+#name: parseArgs
+#output: args, the cmd line arguments the user selected
+#purpose: to parse the host and port number
 def parseArgs():
     #initialize
     parser = argparse.ArgumentParser(prog='client.py', description='Specify host and port to connect to') 
@@ -17,7 +21,8 @@ def parseArgs():
 
     return args
 
-
+#name:repleLoop 
+#purpose: to provide the ability to use the user to type commands in the prompt
 def replLOOP():
     running = True
     print("Welcome to SFTP Clone\n")
@@ -26,9 +31,17 @@ def replLOOP():
         handler(userInput)
 
 
-# massive switch statement, main program logic, returns a bool of successful or not
+#name: handler
+#input: user input string from the REPL
+#output: bool - success or not
+#purpose: to process the logic of the user argument and package data to send to the server
 def handler(userInput):
     userRequest = library.replParse(str(userInput))
+    if(userRequest.baseCMD == "quit"):
+        exit(0)
+        if(user):
+
+
 
 def main():
     args = parseArgs()
