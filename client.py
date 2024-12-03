@@ -43,7 +43,15 @@ def handler(userInput):
         exit(0)
     elif(baseCMD == "help"):
         printHelp()
-    
+    elif(baseCMD == "lpwd"):
+        print("Current Directory: " + library.execBash("pwd"))
+    elif(baseCMD == "ls"):
+        print(library.execBash("lls"))
+    elif(baseCMD == "cd"):
+        directory = userRequest.filePath
+        print(library.execBash(str("lcd " + directory)))
+
+
 
 #purpose: print the massive help string, just in a seperate function for neatness
 def printHelp():
