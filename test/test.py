@@ -26,7 +26,7 @@ def main():
     args = parseArgs()
 
     #testing replParse
-    #not yet implemented
+    #TO-DO Test REPLparse
 
     #testing doesExist(pathString)
     existsArg = args.e
@@ -53,14 +53,14 @@ def main():
     library.bufferToFile(byteFile, newDir)
 
     #testing execBash(commandString)
-    library.execBash("pwd") 
+    #TO-DO Test out other functions
+    library.execBash("pwd") #print working directory
 
+    #testing directoryCopy(filePath)
     directorycopy = library.directoryCopy("planning")
     fullCMD = "cd cpinto; " + str(directorycopy)
     library.execBash(fullCMD)
 
-    #testing directoryCopy(filePath)
-    #not yet implemented
 
 
 

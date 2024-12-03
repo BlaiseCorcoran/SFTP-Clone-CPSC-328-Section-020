@@ -1,6 +1,6 @@
 all: testLib
 
-testLib:
+testLib: test.py
 	cp test.py testLib
 	chmod u+x testLib
 
