@@ -4,7 +4,7 @@
 import argparse
 import socket
 import os
-import library
+import test.library as library
 
 def parseArgs():
     parser = argparse.ArgumentParser(add_help=True)

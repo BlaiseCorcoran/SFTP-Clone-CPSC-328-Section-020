@@ -2,7 +2,7 @@
 
 import argparse
 import os
-import library
+import test.library as library
 import socket
 
 #client

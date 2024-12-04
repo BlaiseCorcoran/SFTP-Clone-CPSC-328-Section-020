@@ -6,7 +6,7 @@ EDIT THE ONE IN THE CLIENT FOLDER
 #!/usr/bin/env python3
 
 import argparse
-import library
+import test.library as library
 import os
 
 #client

@@ -2,7 +2,7 @@
 
 #test python file to make sure the library is working
 
-import library
+import test.library as library
 import argparse
 
 
