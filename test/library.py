@@ -12,8 +12,6 @@ userCMD = {
     "isRecursive" : False
 }
 
-
-
 #input: commands - string that user types in REPL
 #output: userCMD - dictionary with information about the command
 

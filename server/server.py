@@ -7,24 +7,32 @@ import os
 import library
 
 def parseArgs():
+    """
+    Description     : Parses the command line arguments 
+    Return Value    : args - the command line arguments
+    """
     parser = argparse.ArgumentParser(add_help=True)
 
     parser.add_argument('-p', type=str, help='port number')
     parser.add_argument('-d', type=str, help='directory to server files from')
 
     args = parser.parse_args()
-
     return args
 
-def handleClient(client):
+def handleClient(sock):
+    """
+    Description : Parses server commands from the client
+    Parameters  : client - client socket 
+    """
     try:
-        print("SENDING MESSAGE TO THE CLIENT")
-        msg = "Red 40 is my favoritest thing in the world"
-        client.sendall(msg.encode())
+        #receive the command from the client
+        clientCmd = sock.recv(4096).decode()
+        library.userCMD['baseCMD'] = clientCmd
+        #parse the command
+        library.replParse(library.userCMD)
     except Exception as e:
         print(f"Error: {e}")
         
-
 def createServer(port):
     """                                                                                                                                                                                                     
     Description  : creates a server                                                                                                                                                                         
@@ -48,8 +56,12 @@ def reallyRecvall(s, n):
         if len(bytes) == 0: break
     return bytes
 
-def main():
+def main(): 
+    """
+    Description : Runs the main routine of the server
+    """
     args = parseArgs()
+    library.userCMD['filePath'] = args.d
 
     try:
         server = createServer(int(args.p))
@@ -66,8 +78,9 @@ def main():
                 os._exit(0)
             #parent
             else:
-                #os.wait() 
+                os.wait()
                 client.close()
+                os._exit(0)
     except OSError as e:
         print(e)
         os._exit(0)
