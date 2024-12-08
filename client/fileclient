@@ -19,7 +19,7 @@ def parseArgs():
 
     return args
 
-#name:replLoop 
+#name:repleLoop 
 #purpose: to provide the ability to use the user to type commands in the prompt
 def replLOOP():
     running = True
@@ -42,8 +42,8 @@ def handler(userInput):
         printHelp()
     elif(baseCMD == "lpwd"):
         print("Current Directory: " + library.execBash("pwd"))
-    elif(baseCMD == "lls"):
-        print(library.execBash("ls"))
+    elif(baseCMD == "ls"):
+        print(library.execBash("lls"))
     elif(baseCMD == "cd"):
         directory = userRequest.filePath
         print(library.execBash(str("lcd " + directory)))
@@ -86,13 +86,6 @@ def printHelp():
     """
     print(helpString)
 
-# name: constructMessage
-# input: mainMessage - string - what you want to send 
-#        messageType - char - type of message
-#        'f' = file, 'd' = data
-# return: returnString - string to send to server
-def constructMessage(mainMessage, messageType):
-    pass
 
 #Source    : Dr Schwesinger's public CPSC 328 Directory
 #Retreived : November 12th, 2024
