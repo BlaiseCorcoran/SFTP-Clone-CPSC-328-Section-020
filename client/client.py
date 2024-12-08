@@ -44,8 +44,8 @@ def handler(userInput):
         elif(baseCMD == "lpwd"):
             print("Current Directory: ")
             library.execBash("pwd")
-        elif(baseCMD == "ls"):
-            print(library.execBash("lls"))
+        elif(baseCMD == "lls"):
+            print(library.execBash("ls"))
         elif(baseCMD == "cd"):
             directory = userRequest['filePath']
             print(library.execBash(str("lcd " + directory)))
