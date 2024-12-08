@@ -29,7 +29,10 @@ def handleClient(sock):
         clientCmd = sock.recv(4096).decode()
         library.userCMD['baseCMD'] = clientCmd
         #parse the command
-        library.replParse(library.userCMD)
+        parsedCmd = library.replParse(library.userCMD)       
+        #send the command to the client
+        print("SENDING THE RESULT TO THE SERVER")
+        sock.sendall(parsedCmd.encode())
     except Exception as e:
         print(f"Error: {e}")
         

@@ -19,7 +19,7 @@ def parseArgs():
 
     return args
 
-#name:repleLoop 
+#name:replLoop 
 #purpose: to provide the ability to use the user to type commands in the prompt
 def replLOOP():
     running = True
