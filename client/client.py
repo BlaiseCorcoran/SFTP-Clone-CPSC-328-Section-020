@@ -42,8 +42,8 @@ def handler(userInput):
         printHelp()
     elif(baseCMD == "lpwd"):
         print("Current Directory: " + library.execBash("pwd"))
-    elif(baseCMD == "ls"):
-        print(library.execBash("lls"))
+    elif(baseCMD == "lls"):
+        print(library.execBash("ls"))
     elif(baseCMD == "cd"):
         directory = userRequest.filePath
         print(library.execBash(str("lcd " + directory)))
@@ -86,6 +86,13 @@ def printHelp():
     """
     print(helpString)
 
+# name: constructMessage
+# input: mainMessage - string - what you want to send 
+#        messageType - char - type of message
+#        'f' = file, 'd' = data
+# return: returnString - string to send to server
+def constructMessage(mainMessage, messageType):
+    pass
 
 #Source    : Dr Schwesinger's public CPSC 328 Directory
 #Retreived : November 12th, 2024
