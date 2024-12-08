@@ -35,6 +35,27 @@ def replLOOP():
 #purpose: to process the logic of the user argument and package data to send to the server
 def handler(userInput):
     userRequest = library.replParse(str(userInput))
+    baseCMD = userRequest['baseCMD']
+    try:
+        if(baseCMD == "exit"):
+            os._exit(0)
+        elif(baseCMD == "help"):
+            printHelp()
+        elif(baseCMD == "lpwd"):
+            print("Current Directory: ")
+            library.execBash("pwd")
+        elif(baseCMD == "ls"):
+            print(library.execBash("lls"))
+        elif(baseCMD == "cd"):
+            directory = userRequest['filePath']
+            print(library.execBash(str("lcd " + directory)))
+        elif(baseCMD == "lmkdir"):
+            success = library.createDirectory(userRequest['filePath'])
+            print("Succes Code: " + bool(success))
+        else:
+            print("Command Not Found! Enter 'help' For More Info")
+    except OSError as e:
+        print(f"Error! {e}")
     baseCMD = userRequest.baseCMD
     if(baseCMD == "quit"):
         exit(0)
@@ -117,7 +138,7 @@ def main():
             client.connect((args.h, int(args.p))) #connect to the servers
             msgRecv = client.recv(4096)
             print(msgRecv.decode())
-            #replLOOP() #enter the repl loop
+            replLOOP() #enter the repl loop
             client.close() #close the client when done
     except OSError as e:
         print(e)

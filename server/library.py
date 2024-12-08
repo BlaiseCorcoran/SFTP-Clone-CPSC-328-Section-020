@@ -30,58 +30,61 @@ def replParse(userCommandString):
     retval["baseCMD"] = commandArgs[0]
     baseCommand = retval["baseCMD"]
     #no match statement acad's python3 is too old :'(
-    if baseCommand == "exit" :
-        return retval
-    elif baseCommand == "cd" :
-        retval["fileRequested"] = commandArgs[1]
-        return retval
-    elif baseCommand == "get" :
-        if commandArgs.count("-R") > 0:
-            commandArgs.remove("-R")
-            retval["isRecursive"] = True
-        retval["fileRequested"] = commandArgs[1]
-        if len(commandArgs) > 2 :
-            retval["filePath"] = commandArgs[2]
-        return retval
-    elif baseCommand == "help" :
-        return retval
-    elif baseCommand == "lcd" :
-        if len(commandArgs) > 1:
+    try:
+        if baseCommand == "exit" :
+            return retval
+        elif baseCommand == "cd" :
+            retval["fileRequested"] = commandArgs[1]
+            return retval
+        elif baseCommand == "get" :
+            if commandArgs.count("-R") > 0:
+                commandArgs.remove("-R")
+                retval["isRecursive"] = True
+            retval["fileRequested"] = commandArgs[1]
+            if len(commandArgs) > 2 :
+                retval["filePath"] = commandArgs[2]
+            return retval
+        elif baseCommand == "help" :
+            return retval
+        elif baseCommand == "lcd" :
+            if len(commandArgs) > 1:
+                retval["filePath"] = commandArgs[1]
+                return retval
+            else:
+                return retval
+        elif baseCommand == "lls" :
+            if len(commandArgs) > 1 :
+                retval["filePath"] = commandArgs[1]
+                return retval
+            else :
+                return retval
+        elif baseCommand == "lmkdir" :
             retval["filePath"] = commandArgs[1]
             return retval
-        else:
+        elif baseCommand == "lpwd" :
             return retval
-    elif baseCommand == "lls" :
-        if len(commandArgs > 1) :
+        elif baseCommand == "ls" :
+            if len(commandArgs) > 1 :
+                retval["filePath"] = commandArgs[1]
+                return retval
+            else :
+                retval["filePath"] = "./"
+                return retval
+        elif baseCommand == "mkdir":
             retval["filePath"] = commandArgs[1]
             return retval
-        else :
+        elif baseCommand == "put":
+            if(commandArgs.count("-R") > 0) :
+                commandArgs.remove("-R")
+                retval["isRecursive"] = True
+            retval["fileRequested"] = commandArgs[1]
+            if len(commandArgs) > 2:
+                retval["filePath"] = commandArgs[2]
             return retval
-    elif baseCommand == "lmkdir" :
-        retval["filePath"] = commandArgs[1]
-        return retval
-    elif baseCommand == "lpwd" :
-        return retval
-    elif baseCommand == "ls" :
-        if len(commandArgs > 1) :
-            retval["filePath"] = commandArgs[1]
+        elif baseCommand == "pwd":
             return retval
-        else :
-            retval["filePath"] = "./"
-            return retval
-    elif baseCommand == "mkdir":
-        retval["filePath"] = commandArgs[1]
-        return retval
-    elif baseCommand == "put":
-        if(commandArgs.count("-R") > 0) :
-            commandArgs.remove("-R")
-            retval["isRecursive"] = True
-        retval["fileRequested"] = commandArgs[1]
-        if len(commandArgs) > 2:
-            retval["filePath"] = commandArgs[2]
-        return retval
-    elif baseCommand == "pwd":
-        return retval
+    except Exception as e:
+        print(f"Error! {e}")
 
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
