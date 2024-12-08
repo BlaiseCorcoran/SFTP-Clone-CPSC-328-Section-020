@@ -25,6 +25,10 @@ def handleClient(sock):
     Parameters  : client - client socket 
     """
     try:
+        #send the BEGIN' packet
+        print("sending 'BEGIN'")
+        sock.sendall("BEGIN".encode())
+        sock.sendall("\n".encode())
         #receive the command from the client
         clientCmd = sock.recv(4096).decode()
         library.userCMD['baseCMD'] = clientCmd
@@ -78,7 +82,6 @@ def main():
             if pid == 0:
                 server.close()
                 handleClient(client)
-                os._exit(0)
             #parent
             else:
                 os.wait()
