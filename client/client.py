@@ -56,21 +56,6 @@ def handler(userInput):
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
         print(f"Error! {e}")
-    baseCMD = userRequest.baseCMD
-    if(baseCMD == "quit"):
-        exit(0)
-    elif(baseCMD == "help"):
-        printHelp()
-    elif(baseCMD == "lpwd"):
-        print("Current Directory: " + library.execBash("pwd"))
-    elif(baseCMD == "lls"):
-        print(library.execBash("ls"))
-    elif(baseCMD == "cd"):
-        directory = userRequest.filePath
-        print(library.execBash(str("lcd " + directory)))
-    elif(baseCMD == "lmkdir"):
-        success = library.createDirectory(userRequest.filePath)
-        print("Succes Code: " + bool(success))
 
 
 
