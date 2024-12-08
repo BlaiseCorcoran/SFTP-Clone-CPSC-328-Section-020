@@ -46,12 +46,12 @@ def handler(userInput):
             library.execBash("pwd")
         elif(baseCMD == "lls"):
             print(library.execBash("ls"))
-        elif(baseCMD == "cd"):
+        elif(baseCMD == "lcd"):
             directory = userRequest['filePath']
-            print(library.execBash(str("lcd " + directory)))
+            library.execBash(f"cd {directory}")
         elif(baseCMD == "lmkdir"):
             success = library.createDirectory(userRequest['filePath'])
-            print("Succes Code: " + bool(success))
+            print(f"Success Code: + {bool(success)}")
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
