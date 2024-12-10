@@ -13,8 +13,8 @@ def parseArgs():
     """
     parser = argparse.ArgumentParser(add_help=True)
 
-    parser.add_argument('-p', type=str, help='port number')
-    parser.add_argument('-d', type=str, help='directory to server files from')
+    parser.add_argument('-p', type=str, help='port number', required = True)
+    parser.add_argument('-d', type=str, help='directory to server files from', required = True)
 
     args = parser.parse_args()
     return args
@@ -69,7 +69,8 @@ def main():
     """
     args = parseArgs()
     library.userCMD['filePath'] = args.d
-
+    processes = []
+    
     try:
         server = createServer(int(args.p))
         while True:
