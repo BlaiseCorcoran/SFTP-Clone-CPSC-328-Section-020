@@ -20,6 +20,7 @@ def parseArgs(client):
     return args
 
 #name:replLoop 
+#input: client - client socket
 #purpose: to provide the ability to use the user to type commands in the prompt
 def replLOOP(client):
     running = True
@@ -31,7 +32,6 @@ def replLOOP(client):
 
 #name: handler
 #input: user input string from the REPL
-#output: bool - success or not
 #purpose: nasty long fuction to process the logic of the user argument and package data to send to the server
 def handler(userInput, client):
     userRequest = library.replParse(str(userInput))
@@ -92,6 +92,11 @@ def handler(userInput, client):
     except OSError as e:
         print(f"Error! {e}")
 
+#name: handleGET 
+#input: filePath - of server
+#       userPath - of client
+#       client - socket
+#purpose: handle GET command, handles reciving commands from server
 def handleGET(filePath, userPath, client):
     request = "GET " + filePath + "\r\n\r\n"
     client.send(request.encode())
@@ -99,9 +104,17 @@ def handleGET(filePath, userPath, client):
     print("server sends:" + buffer)
     if(buffer.startswith("200")):
         response = buffer.Split("\n")
+
+    if(response[3]=="file\n"):
+        library.execBash(command)
+    if(response[3] == "Directory\n"):
         command = "cd "+ userPath +";" + response[2]
         library.execBash(command)
 
+#name: readSocket
+#input: client - socket
+#returns: str - socketRead - what was read from said socket
+#purpose:reads data from a socket until "\r\n\r\n" 
 def readSocket(client):
     socketRead = b""
     while True:
