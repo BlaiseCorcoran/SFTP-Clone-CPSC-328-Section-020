@@ -54,10 +54,13 @@ def handler(userInput, client):
             print(f"Success Code: + {bool(success)}")
         elif(baseCMD == "mkdir"):
             message = constructMessage("mkdir" + userRequest['filePath'], 'd')
-            sendMessage(message)
+            client.send(message.encode())
         elif(baseCMD == "ls"):
             message = constructMessage("ls",'d')
-            sendMessage(message)
+            client.send(message.encode())
+        elif(baseCMD=="pwd"):
+            message = constructMessage("pwd", "d")
+            client.send(message.encode())
         elif(baseCMD == "put"):
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
@@ -65,7 +68,7 @@ def handler(userInput, client):
                 if(userRequest['isRecursive'] or os.path.isfile(userRequest['filePath'])):
                     if(os.path.isfile(userRequest['filePath'])):
                         fileContents = str(library.fileToByte(userRequest['filePath']))
-                        message = constructMessage("touch " + userRequest['fileRequested'] + "; echo " + userRequest['fileRequested'] + "> " + userRequest['fileRequested'] ,'f')
+                        message = constructMessage("touch " + userRequest['fileRequested'] + "; echo " + fileContents + "> " + userRequest['fileRequested'] ,'f')
                     elif(os.path.isdir(userRequest['filePath'])):
                         directory = library.directoryCopy(userRequest['filePath'])
                         command = "cd " + userRequest['fileRequested'] +";" + command
@@ -73,7 +76,8 @@ def handler(userInput, client):
                     else:
                         print("unexpected, inexplicable error \n")
 
-                    sendMessage(message, client)
+                    client.send(message.encode())
+
                 else:
                     print("Needs to be Recursive with -R due to directory")
 
@@ -81,15 +85,36 @@ def handler(userInput, client):
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
             else:
-                handleGET()
+                handleGET(userRequest['filePath'], userRequest['fileRequested'], client)
 
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
         print(f"Error! {e}")
 
-def handleGET():
-    pass
+def handleGET(filePath, userPath, client):
+    request = "GET " + filePath + "\r\n\r\n"
+    client.send(request.encode())
+    buffer += readSocket(client)
+    print("server sends:" + buffer)
+    if(buffer.startswith("200")):
+        response = buffer.Split("\n")
+        command = "cd "+ userPath +";" + response[2]
+        library.execBash(command)
+
+def readSocket(client):
+    socketRead = b""
+    while True:
+        buffer = client.revc(1024)
+        if buffer == None:
+            break
+        socketRead += buffer
+        if(str(socketRead.decode()).endswith("\r\n\r\n")):
+            break
+
+    return str(socketRead.decode())
+        
+
 
 #purpose: print the massive help string, just in a seperate function for neatness
 def printHelp():
@@ -140,8 +165,7 @@ def constructMessage(mainMessage, messageType):
     returnString += mainMessage + "\r\n\r\n"
     return returnString
 
-def sendMessage(message, client):
-    pass
+
 
 #Source    : Dr Schwesinger's public CPSC 328 Directory
 #Retreived : November 12th, 2024
