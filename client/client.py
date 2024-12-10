@@ -6,7 +6,7 @@ import library
 import socket
 
 #client
-def parseArgs():
+def parseArgs(client):
     #initialize
     parser = argparse.ArgumentParser(prog='client.py', description='Specify host and port to connect to', add_help=False) 
 
@@ -21,19 +21,19 @@ def parseArgs():
 
 #name:replLoop 
 #purpose: to provide the ability to use the user to type commands in the prompt
-def replLOOP():
+def replLOOP(client):
     running = True
     print("Welcome to SFTP Clone\n")
     while running:
         userInput = input("> ")
-        handler(userInput)
+        handler(userInput, client)
 
 
 #name: handler
 #input: user input string from the REPL
 #output: bool - success or not
-#purpose: to process the logic of the user argument and package data to send to the server
-def handler(userInput):
+#purpose: nasty long fuction to process the logic of the user argument and package data to send to the server
+def handler(userInput, client):
     userRequest = library.replParse(str(userInput))
     baseCMD = userRequest['baseCMD']
     try:
@@ -52,12 +52,44 @@ def handler(userInput):
         elif(baseCMD == "lmkdir"):
             success = library.createDirectory(userRequest['filePath'])
             print(f"Success Code: + {bool(success)}")
+        elif(baseCMD == "mkdir"):
+            message = constructMessage("mkdir" + userRequest['filePath'], 'd')
+            sendMessage(message)
+        elif(baseCMD == "ls"):
+            message = constructMessage("ls",'d')
+            sendMessage(message)
+        elif(baseCMD == "put"):
+            if(not library.doesExist(userRequest['filePath'])):
+                print("Directory does not exist")
+            else:
+                if(userRequest['isRecursive'] or os.path.isfile(userRequest['filePath'])):
+                    if(os.path.isfile(userRequest['filePath'])):
+                        fileContents = str(library.fileToByte(userRequest['filePath']))
+                        message = constructMessage("touch " + userRequest['fileRequested'] + "; echo " + userRequest['fileRequested'] + "> " + userRequest['fileRequested'] ,'f')
+                    elif(os.path.isdir(userRequest['filePath'])):
+                        directory = library.directoryCopy(userRequest['filePath'])
+                        command = "cd " + userRequest['fileRequested'] +";" + command
+                        message  = constructMessage(command,'c')
+                    else:
+                        print("unexpected, inexplicable error \n")
+
+                    sendMessage(message, client)
+                else:
+                    print("Needs to be Recursive with -R due to directory")
+
+        elif(baseCMD == "get"):
+            if(not library.doesExist(userRequest['filePath'])):
+                print("Directory does not exist")
+            else:
+                handleGET()
+
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
         print(f"Error! {e}")
 
-
+def handleGET():
+    pass
 
 #purpose: print the massive help string, just in a seperate function for neatness
 def printHelp():
@@ -95,9 +127,20 @@ def printHelp():
 # name: constructMessage
 # input: mainMessage - string - what you want to send 
 #        messageType - char - type of message
-#        'f' = file, 'd' = data
+#        'f' = file, 'd' = data, 'c' - directory
 # return: returnString - string to send to server
 def constructMessage(mainMessage, messageType):
+    if messageType == 'f':
+        returnString = "File\n"
+    elif messageType == 'd':
+        returnString = "Data\n"
+    elif messageType == 'c':
+        returnString = "Directory\n"
+
+    returnString += mainMessage + "\r\n\r\n"
+    return returnString
+
+def sendMessage(message, client):
     pass
 
 #Source    : Dr Schwesinger's public CPSC 328 Directory
@@ -115,6 +158,7 @@ def reallyRecvall(s, n):
         if len(bytes) == 0: break
     return bytes
 
+
 def main():
     args = parseArgs()
 
@@ -123,7 +167,7 @@ def main():
             client.connect((args.h, int(args.p))) #connect to the servers
             msgRecv = client.recv(4096)
             print(msgRecv.decode())
-            replLOOP() #enter the repl loop
+            replLOOP(client) #enter the repl loop
             client.close() #close the client when done
     except OSError as e:
         print(e)
