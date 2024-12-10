@@ -55,12 +55,15 @@ def handler(userInput, client):
         elif(baseCMD == "mkdir"):
             message = constructMessage("mkdir" + userRequest['filePath'], 'd')
             client.send(message.encode())
+            print(readSocket(client))
         elif(baseCMD == "ls"):
             message = constructMessage("ls",'d')
             client.send(message.encode())
+            print(readSocket(client))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
             client.send(message.encode())
+            print(readSocket(client))
         elif(baseCMD == "put"):
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
