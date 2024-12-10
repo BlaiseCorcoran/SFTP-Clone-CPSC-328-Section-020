@@ -48,7 +48,7 @@ def handler(userInput):
             print(library.execBash("ls"))
         elif(baseCMD == "lcd"):
             directory = userRequest['filePath']
-            library.execBash(f"cd {directory}")
+            os.chdir(directory)
         elif(baseCMD == "lmkdir"):
             success = library.createDirectory(userRequest['filePath'])
             print(f"Success Code: + {bool(success)}")
