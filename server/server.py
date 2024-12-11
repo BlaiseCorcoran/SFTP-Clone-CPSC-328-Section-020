@@ -76,13 +76,25 @@ def reallyRecvall(s, n):
         if len(bytes) == 0: break
     return bytes
 
+
+
+def sigintHandler(signum, frame):
+    #
+    #
+    #DO STUFF TO EXIT GRACEFULLY
+    #
+    #
+    exit(1)
+    return
 def main(): 
     """
     Description : Runs the main routine of the server
     """
     args = parseArgs()
     library.userCMD['filePath'] = args.d
-    processes = []
+
+    signal.signal(signal.SIGINT, sigintHandler)
+
     
     try:
         server = createServer(int(args.p))
