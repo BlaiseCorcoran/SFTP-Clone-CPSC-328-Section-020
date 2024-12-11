@@ -128,7 +128,7 @@ def readSocket(client):
         if(str(socketRead.decode()).endswith("\r\n\r\n")):
             break
 
-    return str(socketRead.decode())
+    return str(socketRead.decode())[:-4]
         
 
 

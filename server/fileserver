@@ -54,23 +54,45 @@ def handleClient(sock):
         #give the expected result
         if baseCMD == "pwd":
             currRemoteDir = library.execBash("pwd")
-            print(currRemoteDir)
-            sock.sendall(currRemoteDir.encode())
+            message = constructMessage((currRemoteDir+" created"), 'd', 200)
+            print(message)
+            sock.sendall(message.encode())
         if baseCMD == "cd":
             changedRemoteDir = userRequest['filePath']
             os.chdir(changedRemoteDir)
+            message = constructMessage((userRequest['filePath']+" created"), 'd', 200)
+            print(message.encode())
+            sock.sendall(message.encode())
         if baseCMD == "ls":
             result = library.execBash("ls")
-            result += "\n\r\n\r\n"
-            print(result)
-            sock.sendall(result.encode())
+            message = constructMessage(result, 'd', 200) 
+            print(message)
+            sock.sendall(message.encode())
         if baseCMD == "mkdir":
             success = library.createDirectory(userRequest['filePath'])
             success = f"Success Code: {bool(success)}"
+            if success:
+                errorCode = 200
+            else:
+                errorCode = 404
+            success = constructMessage(success.encode(), type, errorCode)
             sock.sendall(success.encode())
     except Exception as e:
         print(f"Error: {e}")
-        
+
+
+def constructMessage(message, type, errorCode):
+    retMessage = str(errorCode) + "\n"
+
+    if(type == 'f'):
+        retMessage += "file\n"
+    elif(type =='d'):
+        retMessage += "data\n"
+    elif(type=="c"):
+        retMessage += "directory\n"
+    
+    return (retMessage + message + "\r\n\r\n")
+
 def createServer(port):
     """                                                                                                                                                                                                     
     Description  : creates a server                                                                                                                                                                         
