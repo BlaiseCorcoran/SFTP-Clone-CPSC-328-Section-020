@@ -45,7 +45,8 @@ def handler(userInput, client):
             print("Current Directory: ")
             library.execBash("pwd")
         elif(baseCMD == "lls"):
-            print(library.execBash("ls"))
+            #print(library.execBash("ls"))
+            library.execBash("ls")
         elif(baseCMD == "lcd"):
             directory = userRequest['filePath']
             os.chdir(directory)
