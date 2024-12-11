@@ -121,7 +121,7 @@ def handleGET(filePath, userPath, client):
 def readSocket(client):
     socketRead = b""
     while True:
-        buffer = client.revc(1024)
+        buffer = client.recv(1024)
         if buffer == None:
             break
         socketRead += buffer
