@@ -134,7 +134,7 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = subprocess.run(commandString, shell=True, capture_output=True, text=True, check=True) 
+    ret = subprocess.run(commandString, shell=True, check=True)
     return ret
 
 # input: filePath; commandBuild string use empty string; right 
