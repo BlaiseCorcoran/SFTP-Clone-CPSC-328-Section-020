@@ -62,6 +62,7 @@ def handler(userInput, client):
             print(readSocket(client))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
+            print(message)
             client.send(message.encode())
             print(readSocket(client))
         elif(baseCMD == "put"):
@@ -103,10 +104,13 @@ def handler(userInput, client):
 def handleGET(filePath, userPath, client):
     request = "GET " + filePath + "\r\n\r\n"
     client.send(request.encode())
-    buffer += readSocket(client)
+    buffer = readSocket(client)
     print("server sends:" + buffer)
     if(buffer.startswith("200")):
         response = buffer.Split("\n")
+    else:
+        print("Error Occured \n")
+        return
 
     if(response[3]=="file\n"):
         library.execBash(command)
