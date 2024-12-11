@@ -6,6 +6,8 @@ import library
 import socket
 
 #client
+#name: parseArgs()
+#purpose: parse cmd line arguments
 def parseArgs():
     #initialize
     parser = argparse.ArgumentParser(prog='client.py', description='Specify host and port to connect to', add_help=False) 
