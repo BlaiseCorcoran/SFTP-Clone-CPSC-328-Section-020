@@ -34,9 +34,20 @@ def handleClient(sock):
         library.userCMD['baseCMD'] = clientCmd
         #parse the command
         parsedCmd = library.replParse(library.userCMD)       
-        #send the command to the client
-        print("SENDING THE RESULT TO THE SERVER")
-        sock.sendall(parsedCmd.encode())
+        #give the expected result
+        if clientCmd == "pwd":
+            currRemoteDir = library.execBash("pwd")
+            sock.sendall(str(currRemoteDir).encode())
+        elif clientCmd == "cd":
+            changedRemoteDir = parsedCmd['filePath']
+            os.chdir(changedRemoteDir)
+        elif clientCmd == "ls":
+            listRemoteDir = library.execBash("ls")
+            sock.sendall(str(listRemoteDir).encode())
+        elif clientCmd == "mkdir":
+            success = library.createDirectory(parsedCmd['filePath'])
+            success = f"Success Code: + {bool(success)}"
+            sock.sendall(success.encode())
     except Exception as e:
         print(f"Error: {e}")
         

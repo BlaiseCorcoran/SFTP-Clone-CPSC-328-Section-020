@@ -6,7 +6,7 @@ import library
 import socket
 
 #client
-def parseArgs(client):
+def parseArgs():
     #initialize
     parser = argparse.ArgumentParser(prog='client.py', description='Specify host and port to connect to', add_help=False) 
 
@@ -55,14 +55,20 @@ def handler(userInput, client):
         elif(baseCMD == "mkdir"):
             message = constructMessage("mkdir" + userRequest['filePath'], 'd')
             client.send(message.encode())
+            recv = readSocket(client)
+            print(recv.decode())
             print(readSocket(client))
         elif(baseCMD == "ls"):
             message = constructMessage("ls",'d')
             client.send(message.encode())
+            recv = readSocket(client)
+            print(recv.decode())
             print(readSocket(client))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
             client.send(message.encode())
+            recv = readSocket(client)
+            print(recv.decode())
             print(readSocket(client))
         elif(baseCMD == "put"):
             if(not library.doesExist(userRequest['filePath'])):
@@ -121,7 +127,7 @@ def handleGET(filePath, userPath, client):
 def readSocket(client):
     socketRead = b""
     while True:
-        buffer = client.recv(1024)
+        buffer = client.recv(4096)
         if buffer == None:
             break
         socketRead += buffer

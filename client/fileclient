@@ -20,20 +20,20 @@ def parseArgs():
     return args
 
 #name:replLoop 
+#input: client - client socket
 #purpose: to provide the ability to use the user to type commands in the prompt
-def replLOOP():
+def replLOOP(client):
     running = True
     print("Welcome to SFTP Clone\n")
     while running:
         userInput = input("> ")
-        handler(userInput)
+        handler(userInput, client)
 
 
 #name: handler
 #input: user input string from the REPL
-#output: bool - success or not
-#purpose: to process the logic of the user argument and package data to send to the server
-def handler(userInput):
+#purpose: nasty long fuction to process the logic of the user argument and package data to send to the server
+def handler(userInput, client):
     userRequest = library.replParse(str(userInput))
     baseCMD = userRequest['baseCMD']
     try:
@@ -52,11 +52,88 @@ def handler(userInput):
         elif(baseCMD == "lmkdir"):
             success = library.createDirectory(userRequest['filePath'])
             print(f"Success Code: + {bool(success)}")
+        elif(baseCMD == "mkdir"):
+            message = constructMessage("mkdir" + userRequest['filePath'], 'd')
+            client.send(message.encode())
+            recv = readSocket(client)
+            print(recv.decode())
+        elif(baseCMD == "ls"):
+            message = constructMessage("ls",'d')
+            client.send(message.encode())
+            recv = readSocket(client)
+            print(recv.decode())
+        elif(baseCMD=="pwd"):
+            #message = constructMessage("pwd", "d")
+            message = baseCMD
+            client.send(message.encode())
+            recv = readSocket(client)
+            print(recv.decode())
+        elif(baseCMD == "put"):
+            if(not library.doesExist(userRequest['filePath'])):
+                print("Directory does not exist")
+            else:
+                if(userRequest['isRecursive'] or os.path.isfile(userRequest['filePath'])):
+                    if(os.path.isfile(userRequest['filePath'])):
+                        fileContents = str(library.fileToByte(userRequest['filePath']))
+                        message = constructMessage("touch " + userRequest['fileRequested'] + "; echo " + fileContents + "> " + userRequest['fileRequested'] ,'f')
+                    elif(os.path.isdir(userRequest['filePath'])):
+                        directory = library.directoryCopy(userRequest['filePath'])
+                        command = "cd " + userRequest['fileRequested'] +";" + command
+                        message  = constructMessage(command,'c')
+                    else:
+                        print("unexpected, inexplicable error \n")
+
+                    client.send(message.encode())
+
+                else:
+                    print("Needs to be Recursive with -R due to directory")
+
+        elif(baseCMD == "get"):
+            if(not library.doesExist(userRequest['filePath'])):
+                print("Directory does not exist")
+            else:
+                handleGET(userRequest['filePath'], userRequest['fileRequested'], client)
+
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
         print(f"Error! {e}")
 
+#name: handleGET 
+#input: filePath - of server
+#       userPath - of client
+#       client - socket
+#purpose: handle GET command, handles reciving commands from server
+def handleGET(filePath, userPath, client):
+    request = "GET " + filePath + "\r\n\r\n"
+    client.send(request.encode())
+    buffer += readSocket(client)
+    print("server sends:" + buffer)
+    if(buffer.startswith("200")):
+        response = buffer.Split("\n")
+
+    if(response[3]=="file\n"):
+        library.execBash(command)
+    if(response[3] == "Directory\n"):
+        command = "cd "+ userPath +";" + response[2]
+        library.execBash(command)
+
+#name: readSocket
+#input: client - socket
+#returns: str - socketRead - what was read from said socket
+#purpose:reads data from a socket until "\r\n\r\n" 
+def readSocket(client):
+    socketRead = b""
+    while True:
+        buffer = client.recv(4096)
+        if buffer == None:
+            break
+        socketRead += buffer
+        if(str(socketRead.decode()).endswith("\r\n\r\n")):
+            break
+
+    return str(socketRead.decode())
+        
 
 
 #purpose: print the massive help string, just in a seperate function for neatness
@@ -95,10 +172,20 @@ def printHelp():
 # name: constructMessage
 # input: mainMessage - string - what you want to send 
 #        messageType - char - type of message
-#        'f' = file, 'd' = data
+#        'f' = file, 'd' = data, 'c' - directory
 # return: returnString - string to send to server
 def constructMessage(mainMessage, messageType):
-    pass
+    if messageType == 'f':
+        returnString = "File\n"
+    elif messageType == 'd':
+        returnString = "Data\n"
+    elif messageType == 'c':
+        returnString = "Directory\n"
+
+    returnString += mainMessage + "\r\n\r\n"
+    return returnString
+
+
 
 #Source    : Dr Schwesinger's public CPSC 328 Directory
 #Retreived : November 12th, 2024
@@ -115,6 +202,7 @@ def reallyRecvall(s, n):
         if len(bytes) == 0: break
     return bytes
 
+
 def main():
     args = parseArgs()
 
@@ -123,7 +211,7 @@ def main():
             client.connect((args.h, int(args.p))) #connect to the servers
             msgRecv = client.recv(4096)
             print(msgRecv.decode())
-            replLOOP() #enter the repl loop
+            replLOOP(client) #enter the repl loop
             client.close() #close the client when done
     except OSError as e:
         print(e)
