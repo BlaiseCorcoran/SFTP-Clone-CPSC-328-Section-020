@@ -37,9 +37,8 @@ def handler(userInput, client):
     userRequest = library.replParse(str(userInput))
     baseCMD = userRequest['baseCMD']
     try:
-        #local commands
         if(baseCMD == "exit"):
-            os._exit(0) #exit the program
+            os._exit(0)
         elif(baseCMD == "help"):
             printHelp()
         elif(baseCMD == "lpwd"):
@@ -54,23 +53,17 @@ def handler(userInput, client):
             success = library.createDirectory(userRequest['filePath'])
             print(f"Success Code: + {bool(success)}")
         elif(baseCMD == "mkdir"):
-            message = constructMessage("mkdir" + userRequest['filePath'], 'd') #construct message
-            client.sendall(message.encode()) #send the message
-            client.sendall(baseCMD.encode()) #send the command
-            print(client.recv(4096).decode()) #print the result 
+            message = constructMessage("mkdir" + userRequest['filePath'], 'd')
+            client.send(message.encode())
+            print(readSocket(client))
         elif(baseCMD == "ls"):
-            message = constructMessage("ls", "d") #construct message
-            client.sendall(message.encode()) #send the message
-            client.sendall(baseCMD.encode()) #send the command
-            r = reallyRecvall(client, 1)
-            print(client.recv(1024).decode()) #print the result 
+            message = constructMessage("ls",'d')
+            client.send(message.encode())
+            print(readSocket(client))
         elif(baseCMD=="pwd"):
-            message = constructMessage("pwd","d") #construct message
-            client.sendall(message.encode()) #send the message
-            client.sendall(baseCMD.encode()) #send the command
-            #print(client.recv(4096).decode()) #print the result
-            r = reallyRecvall(client, 1)
-            print(client.recv(4096).decode())
+            message = constructMessage("pwd", "d")
+            client.send(message.encode())
+            print(readSocket(client))
         elif(baseCMD == "put"):
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
@@ -86,7 +79,7 @@ def handler(userInput, client):
                     else:
                         print("unexpected, inexplicable error \n")
 
-                    client.sendall(message.encode())
+                    client.send(message.encode())
 
                 else:
                     print("Needs to be Recursive with -R due to directory")
@@ -109,7 +102,7 @@ def handler(userInput, client):
 #purpose: handle GET command, handles reciving commands from server
 def handleGET(filePath, userPath, client):
     request = "GET " + filePath + "\r\n\r\n"
-    client.sendall(request.encode())
+    client.send(request.encode())
     buffer += readSocket(client)
     print("server sends:" + buffer)
     if(buffer.startswith("200")):
@@ -128,14 +121,14 @@ def handleGET(filePath, userPath, client):
 def readSocket(client):
     socketRead = b""
     while True:
-        buffer = client.recv(4096)
+        buffer = client.recv(1024)
         if buffer == None:
             break
         socketRead += buffer
         if(str(socketRead.decode()).endswith("\r\n\r\n")):
             break
 
-    return socketRead.decode()
+    return str(socketRead.decode())
         
 
 
@@ -185,7 +178,7 @@ def constructMessage(mainMessage, messageType):
     elif messageType == 'c':
         returnString = "Directory\n"
 
-    returnString += mainMessage + "\r\n\r\n"
+    returnString += mainMessage + "\n" + "\r\n\r\n"
     return returnString
 
 
@@ -212,7 +205,7 @@ def main():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             client.connect((args.h, int(args.p))) #connect to the servers
-            msgRecv = client.recv(4096)
+            msgRecv = client.recv(10)
             print(msgRecv.decode())
             replLOOP(client) #enter the repl loop
             client.close() #close the client when done

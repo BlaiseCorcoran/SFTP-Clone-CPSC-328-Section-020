@@ -22,6 +22,18 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+def readSocket(client):
+    socketRead = b""
+    while True:
+        buffer = client.recv(1024)
+        if buffer == None:
+            break
+        socketRead += buffer
+        if(str(socketRead.decode()).endswith("\r\n\r\n")):
+            break
+
+    return str(socketRead.decode())
+ 
 def handleClient(sock):
     """
     Description : Parses server commands from the client
@@ -31,25 +43,27 @@ def handleClient(sock):
 
         #send the BEGIN' packet
         print("sending 'BEGIN'")
-        sock.sendall("BEGIN".encode())
-        sock.sendall("\n".encode())
-        clientMsg = sock.recv(4096).decode()
-        print(clientMsg)
-        clientCmd = sock.recv(4096).decode() 
+        sock.sendall("BEGIN\n".encode())
+        sock.sendall("\r\n\r\n".encode())
+        clientMes = readSocket(sock)
+        clientCmd = (clientMes.split('\n'))[1]
+        print(clientCmd)
         userRequest = library.replParse(str(clientCmd))
         baseCMD = userRequest['baseCMD']    
         print(baseCMD)
         #give the expected result
         if baseCMD == "pwd":
-            currRemoteDir = os.getcwd()
+            currRemoteDir = library.execBash("pwd")
             print(currRemoteDir)
             sock.sendall(currRemoteDir.encode())
         if baseCMD == "cd":
             changedRemoteDir = userRequest['filePath']
             os.chdir(changedRemoteDir)
         if baseCMD == "ls":
-            result = subprocess.run(['ls'], capture_output=True, text=True)
-            sock.send(result.stdout.encode())
+            result = library.execBash("ls")
+            result += "\n\r\n\r\n"
+            print(result)
+            sock.sendall(result.encode())
         if baseCMD == "mkdir":
             success = library.createDirectory(userRequest['filePath'])
             success = f"Success Code: {bool(success)}"

@@ -134,8 +134,8 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = os.system(commandString)
-    return ret
+    ret = subprocess.run(commandString, shell=True, capture_output=True, text=True, check=True) 
+    return str(ret.stdout)
 
 # input: filePath; commandBuild string use empty string; right 
 # return: string - bash commands to copy directory
