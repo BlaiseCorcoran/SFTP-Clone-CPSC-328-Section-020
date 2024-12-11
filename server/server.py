@@ -36,8 +36,8 @@ def handleClient(sock):
         parsedCmd = library.replParse(library.userCMD)       
         #give the expected result
         if clientCmd == "pwd":
-            currRemoteDir = library.execBash("pwd")
-            sock.sendall(str(currRemoteDir).encode())
+            currRemoteDir = os.curdir()
+            sock.sendall(currRemoteDir.encode())
         elif clientCmd == "cd":
             changedRemoteDir = parsedCmd['filePath']
             os.chdir(changedRemoteDir)
