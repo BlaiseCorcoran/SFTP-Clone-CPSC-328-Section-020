@@ -5,6 +5,8 @@ import argparse
 import socket
 import os
 import library
+import multiprocessing
+import signal
 
 def parseArgs():
     """
@@ -87,22 +89,29 @@ def main():
         while True:
             client, _ = server.accept()
 
-            #fork a new process
-            pid = os.fork() 
+            socketList.append(client)
+            processList.append( multiprocessing.Process(target = handleClient, args = (client,) ))
+            processList[-1].run()
 
+            
+            #fork a new process
+#            pid = os.fork() 
+#
             #child
-            if pid == 0:
-                server.close()
-                handleClient(client)
-            #parent
-            else:
-                os.wait()
-                client.close()
-                os._exit(0)
+#           if pid == 0:
+#                server.close()
+#                handleClient(client)
+#            #parent
+#            else:
+#                os.wait()
+#                client.close()
+#                os._exit(0)
     except OSError as e:
         print(e)
         os._exit(0)
         print(f"Connection Error {e}")
 
 if __name__ == "__main__":
+    processList = []
+    socketList = []
     main()
