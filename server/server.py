@@ -6,6 +6,7 @@ import socket
 import os
 import library
 import multiprocessing
+import subprocess
 import signal
 
 def parseArgs():
@@ -27,28 +28,31 @@ def handleClient(sock):
     Parameters  : client - client socket 
     """
     try:
+
         #send the BEGIN' packet
         print("sending 'BEGIN'")
         sock.sendall("BEGIN".encode())
         sock.sendall("\n".encode())
-        #receive the command from the client
-        clientCmd = sock.recv(4096).decode()
-        library.userCMD['baseCMD'] = clientCmd
-        #parse the command
-        parsedCmd = library.replParse(library.userCMD)       
+        clientMsg = sock.recv(4096).decode()
+        print(clientMsg)
+        clientCmd = sock.recv(4096).decode() 
+        userRequest = library.replParse(str(clientCmd))
+        baseCMD = userRequest['baseCMD']    
+        print(baseCMD)
         #give the expected result
-        if clientCmd == "pwd":
-            currRemoteDir = os.curdir()
+        if baseCMD == "pwd":
+            currRemoteDir = os.getcwd()
+            print(currRemoteDir)
             sock.sendall(currRemoteDir.encode())
-        elif clientCmd == "cd":
-            changedRemoteDir = parsedCmd['filePath']
+        if baseCMD == "cd":
+            changedRemoteDir = userRequest['filePath']
             os.chdir(changedRemoteDir)
-        elif clientCmd == "ls":
-            listRemoteDir = library.execBash("ls")
-            sock.sendall(str(listRemoteDir).encode())
-        elif clientCmd == "mkdir":
-            success = library.createDirectory(parsedCmd['filePath'])
-            success = f"Success Code: + {bool(success)}"
+        if baseCMD == "ls":
+            result = subprocess.run(['ls'], capture_output=True, text=True)
+            sock.send(result.stdout.encode())
+        if baseCMD == "mkdir":
+            success = library.createDirectory(userRequest['filePath'])
+            success = f"Success Code: {bool(success)}"
             sock.sendall(success.encode())
     except Exception as e:
         print(f"Error: {e}")
@@ -86,12 +90,15 @@ def sigintHandler(signum, frame):
     #
     exit(1)
     return
+
+
 def main(): 
     """
     Description : Runs the main routine of the server
     """
     args = parseArgs()
     library.userCMD['filePath'] = args.d
+    os.chdir(library.userCMD['filePath'])
 
     signal.signal(signal.SIGINT, sigintHandler)
 

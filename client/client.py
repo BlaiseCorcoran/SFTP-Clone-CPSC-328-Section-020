@@ -37,8 +37,9 @@ def handler(userInput, client):
     userRequest = library.replParse(str(userInput))
     baseCMD = userRequest['baseCMD']
     try:
+        #local commands
         if(baseCMD == "exit"):
-            os._exit(0)
+            os._exit(0) #exit the program
         elif(baseCMD == "help"):
             printHelp()
         elif(baseCMD == "lpwd"):
@@ -53,21 +54,23 @@ def handler(userInput, client):
             success = library.createDirectory(userRequest['filePath'])
             print(f"Success Code: + {bool(success)}")
         elif(baseCMD == "mkdir"):
-            message = constructMessage("mkdir" + userRequest['filePath'], 'd')
-            client.sendall(message.encode())
-            recv = readSocket(client)
-            print(recv.decode())
-            print(readSocket(client))
+            message = constructMessage("mkdir" + userRequest['filePath'], 'd') #construct message
+            client.sendall(message.encode()) #send the message
+            client.sendall(baseCMD.encode()) #send the command
+            print(client.recv(4096).decode()) #print the result 
         elif(baseCMD == "ls"):
-            message = constructMessage("ls",'d')
-            client.sendall(message.encode())
-            recv = readSocket(client)
-            print(recv.decode())
+            message = constructMessage("ls", "d") #construct message
+            client.sendall(message.encode()) #send the message
+            client.sendall(baseCMD.encode()) #send the command
+            r = reallyRecvall(client, 1)
+            print(client.recv(1024).decode()) #print the result 
         elif(baseCMD=="pwd"):
-            message = constructMessage("pwd", "d")
-            client.sendall(message.encode())
-            recv = readSocket(client)
-            print(recv.decode())
+            message = constructMessage("pwd","d") #construct message
+            client.sendall(message.encode()) #send the message
+            client.sendall(baseCMD.encode()) #send the command
+            #print(client.recv(4096).decode()) #print the result
+            r = reallyRecvall(client, 1)
+            print(client.recv(4096).decode())
         elif(baseCMD == "put"):
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
@@ -132,7 +135,7 @@ def readSocket(client):
         if(str(socketRead.decode()).endswith("\r\n\r\n")):
             break
 
-    return str(socketRead.decode())
+    return socketRead.decode()
         
 
 
