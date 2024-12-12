@@ -54,7 +54,7 @@ def handleClient(sock, args):
         # send the BEGIN' packet
         print("sending 'BEGIN'")
         sock.sendall("BEGIN\n\r\n\r\n".encode())
-        while sock != 0:
+        while sock.send(b''):
             clientMes = readSocket(sock)
             clientCmd = (clientMes.split("\n"))[1]
             print(clientCmd)
@@ -112,7 +112,7 @@ def handleClient(sock, args):
                 message = constructMessage(output, type, code)
                 sock.send(message.encode())
             if baseCMD == "put":
-                
+                pass
             
             if baseCMD == "mkdir":
                 success = str(library.createDirectory(userRequest["filePath"]))
@@ -123,8 +123,10 @@ def handleClient(sock, args):
                     errorCode = 404
                 success = constructMessage(success, "c", errorCode)
                 sock.send(success.encode())
+        sock.close()
     except Exception as e:
         print(f"Error: {e}")
+
 
 def get_dir_path(req):
     """

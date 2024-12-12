@@ -54,7 +54,7 @@ def handleClient(sock, args):
         # send the BEGIN' packet
         print("sending 'BEGIN'")
         sock.sendall("BEGIN\n\r\n\r\n".encode())
-        while sock != 0:
+        while sock.send(b''):
             clientMes = readSocket(sock)
             clientCmd = (clientMes.split("\n"))[1]
             print(clientCmd)
@@ -111,6 +111,9 @@ def handleClient(sock, args):
                     print(output)
                 message = constructMessage(output, type, code)
                 sock.send(message.encode())
+            if baseCMD == "put":
+                pass
+            
             if baseCMD == "mkdir":
                 success = str(library.createDirectory(userRequest["filePath"]))
                 success = f"Success Code: {success}"

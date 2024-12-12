@@ -50,11 +50,14 @@ def handler(userInput, client):
                   client - the client socket
     """
     userRequest = library.replParse(str(userInput))
+    if userRequest == None:
+        print("command fails to exist")
+        return
     baseCMD = userRequest['baseCMD']
     try:
         if(baseCMD == "exit"):
             message = constructMessage("exit", "d")
-            client.send(message.encode())
+            client.sendall(message.encode())
             client.close()
             os._exit(0)
         elif(baseCMD == "help"):
@@ -73,21 +76,21 @@ def handler(userInput, client):
         elif(baseCMD == "mkdir"):
             message = constructMessage(f"mkdir {userRequest['filePath']}", 'd')
             print(message)
-            client.send(message.encode())
+            client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "ls"):
             message = constructMessage("ls",'d')
-            client.send(message.encode())
+            client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
             print(message)
-            client.send(message.encode())
+            client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "cd"):
             message = constructMessage(f"cd {userRequest['fileRequested']}", "d")
             print(message)
-            client.send(message.encode())
+            client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "put"):
             if(not library.doesExist(userRequest['filePath'])):
@@ -103,7 +106,7 @@ def handler(userInput, client):
                         message  = constructMessage(command,'c')
                     else:
                         print("unexpected, inexplicable error \n")
-                    client.send(message.encode())
+                    client.sendall(message.encode())
                 else:
                     print("Needs to be Recursive with -R due to directory")
         elif(baseCMD == "get"):
@@ -113,6 +116,13 @@ def handler(userInput, client):
     except OSError as e:
         print(f"Error! {e}")
 
+
+
+#def handlePut(
+        
+
+
+        
 #name: handleGET 
 #input: filePath - of server
 #       userPath - of client
@@ -126,7 +136,7 @@ def handleGET(clientCMD, userPath, dirToCopy, client):
                   client - the client socket
     """
     request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
-    client.send(request.encode())
+    client.sendall(request.encode())
     buffer = readSocket(client)
     if buffer.startswith("200"):
         response = buffer.splitlines()  # Use splitlines for better newline handling

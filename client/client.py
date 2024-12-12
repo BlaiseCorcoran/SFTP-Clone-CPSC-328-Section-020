@@ -50,6 +50,9 @@ def handler(userInput, client):
                   client - the client socket
     """
     userRequest = library.replParse(str(userInput))
+    if userRequest == None:
+        print("command fails to exist")
+        return
     baseCMD = userRequest['baseCMD']
     try:
         if(baseCMD == "exit"):
