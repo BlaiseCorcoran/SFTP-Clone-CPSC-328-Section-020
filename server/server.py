@@ -111,6 +111,9 @@ def handleClient(sock, args):
                     print(output)
                 message = constructMessage(output, type, code)
                 sock.send(message.encode())
+            if baseCMD == "put":
+                
+            
             if baseCMD == "mkdir":
                 success = str(library.createDirectory(userRequest["filePath"]))
                 success = f"Success Code: {success}"

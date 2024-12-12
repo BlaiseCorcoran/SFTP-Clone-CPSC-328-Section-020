@@ -134,9 +134,8 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = subprocess.check_output(commandString, shell=True, text=True)
-    return str(ret)
-
+    ret = subprocess.run(commandString, shell=True, check=True)
+    return str(ret.stdout)
 
 # input: filePath; commandBuild string use empty string; right 
 # return: string - bash commands to copy directory
@@ -147,16 +146,14 @@ def directoryCopy(filePath):
     for root, dirs, files in os.walk(filePath):
         for name in dirs:
             dirPath = os.path.join(root, name)
-            commandBuild += f"mkdir -p '{dirPath}';" 
+            commandBuild += f"mkdir -p '{dirPath}';\n" 
         for name in files:
             pathFile = os.path.join(root, name)
-            filebytes = str(fileToByte(pathFile).decode())
-            fileString= filebytes.replace("'", r"\'")  
-            fileString= filebytes.replace("'", r"\#") 
-            commandBuild += f"echo '{fileString}' > {pathFile};"
+            filebytes = str(fileToByte(pathFile))
+            fileString= filebytes.replace("'", "'\\''")  # Escape single quotes for shell
+            commandBuild += f"echo '{fileString}' > '{pathFile}';\n" 
 
     return commandBuild
-
 
 def main():
     pass
