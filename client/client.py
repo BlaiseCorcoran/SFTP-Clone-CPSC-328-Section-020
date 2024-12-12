@@ -45,10 +45,9 @@ def handler(userInput, client):
             printHelp()
         elif(baseCMD == "lpwd"):
             print("Current Directory: ")
-            library.execBash("pwd")
+            os.system("pwd")
         elif(baseCMD == "lls"):
-            #print(library.execBash("ls"))
-            library.execBash("ls")
+            os.system("ls")
         elif(baseCMD == "lcd"):
             directory = userRequest['filePath']
             os.chdir(directory)
@@ -56,7 +55,8 @@ def handler(userInput, client):
             success = library.createDirectory(userRequest['filePath'])
             print(f"Success Code: + {bool(success)}")
         elif(baseCMD == "mkdir"):
-            message = constructMessage("mkdir" + userRequest['filePath'], 'd')
+            message = constructMessage(f"mkdir {userRequest['filePath']}", 'd')
+            print(message)
             client.send(message.encode())
             print(readSocket(client))
         elif(baseCMD == "ls"):
@@ -65,6 +65,11 @@ def handler(userInput, client):
             print(readSocket(client))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
+            print(message)
+            client.send(message.encode())
+            print(readSocket(client))
+        elif(baseCMD == "cd"):
+            message = constructMessage(f"cd {userRequest['fileRequested']}", "d")
             print(message)
             client.send(message.encode())
             print(readSocket(client))
@@ -82,14 +87,14 @@ def handler(userInput, client):
                         message  = constructMessage(command,'c')
                     else:
                         print("unexpected, inexplicable error \n")
-
                     client.send(message.encode())
-
                 else:
                     print("Needs to be Recursive with -R due to directory")
-
         elif(baseCMD == "get"):
-                handleGET(userInput, userRequest['filePath'], client)
+            if(not library.doesExist(userRequest['filePath'])):
+                print("Directory does not exist")
+            else:
+                handleGET(userRequest['filePath'], userRequest['fileRequested'], client)
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
@@ -219,7 +224,11 @@ def main():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             client.connect((args.h, int(args.p))) #connect to the servers
-            msgRecv = client.recv(10)
+            bytesrecv = 0
+            msgRecv = b''
+            while not bytesrecv == 10:
+                msgRecv += client.recv(10)
+                bytesrecv = len(msgRecv)
             print(msgRecv.decode())
             replLOOP(client) #enter the repl loop
             client.close() #close the client when done
