@@ -93,6 +93,8 @@ def handler(userInput, client):
             client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "put"):
+            handlePut(client, userRequest)
+            return
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
             else:
@@ -143,7 +145,7 @@ def handlePut(sock, userRequest):
         code = 500
         output = "Unknown error"
 
-    message = constructMessage(output, type, code)
+    message = "200\n" + constructMessage(output, type)
     if not(code == 200):
         print (f"error: {code}")
         return
@@ -153,7 +155,7 @@ def handlePut(sock, userRequest):
         print("200 ok")
     else:
         print("error from server")
-        
+
 
 
 
