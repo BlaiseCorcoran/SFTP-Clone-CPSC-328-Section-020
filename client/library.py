@@ -133,9 +133,10 @@ def bufferToFile(buffer, filePath):
 
 # input: commandString - command to execute
 # return: string - return of execution
+# found https://docs.python.org/3/library/subprocess.html#subprocess.check_output
 def execBash(commandString):
-    ret = subprocess.run(commandString, shell=True, check=True)
-    return str(ret.stdout)
+    ret = subprocess.check_output(commandString, shell=True, stderr=subprocess.STDOUT)
+    return str(ret.decode())
 
 # input: filePath; commandBuild string use empty string; right 
 # return: string - bash commands to copy directory
@@ -150,7 +151,8 @@ def directoryCopy(filePath):
         for name in files:
             pathFile = os.path.join(root, name)
             filebytes = str(fileToByte(pathFile))
-            fileString= filebytes.replace("'", "'\\''")  # Escape single quotes for shell
+            fileString= filebytes.replace("'", "'\\''")  
+            fileString= filebytes.replace("'", "'\\#'")
             commandBuild += f"echo '{fileString}' > '{pathFile}';\n" 
 
     return commandBuild

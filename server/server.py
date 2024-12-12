@@ -36,8 +36,10 @@ def readSocket(client):
     socketRead = b""
     while True:
         buffer = client.recv(1024)
-        if buffer == None:
+        if not buffer:
+            print("client closed connection")
             client.close()
+            return 0
         socketRead += buffer
         if str(socketRead.decode()).endswith("\r\n\r\n"):
             break
@@ -54,8 +56,10 @@ def handleClient(sock, args):
         # send the BEGIN' packet
         print("sending 'BEGIN'")
         sock.sendall("BEGIN\n\r\n\r\n".encode())
-        while sock.send(b''):
+        while True:
             clientMes = readSocket(sock)
+            if clientMes == 0:
+                return
             clientCmd = (clientMes.split("\n"))[1]
             print(clientCmd)
             userRequest = library.replParse(str(clientCmd))
@@ -65,7 +69,7 @@ def handleClient(sock, args):
             if baseCMD == "exit":
                 print("Closing Connection")
                 sock.close()
-                os._exit(0)
+                return
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -123,9 +127,10 @@ def handleClient(sock, args):
                     errorCode = 404
                 success = constructMessage(success, "c", errorCode)
                 sock.send(success.encode())
-        sock.close()
     except Exception as e:
         print(f"Error: {e}")
+        sock.close()
+        return
 
 
 def get_dir_path(req):
