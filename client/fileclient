@@ -82,35 +82,19 @@ def handler(userInput, client):
             message = constructMessage("ls",'d')
             client.sendall(message.encode())
             parsedResp = (readSocket(client)).split('\n')
-            print("".join(parsedResp[2:]))
+            print(" ".join(parsedResp[2:]))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
             client.sendall(message.encode())
             parsedResp = (readSocket(client)).split('\n')
-            print("".join(parsedResp[2:]))
+            print(" ".join(parsedResp[2:]))
         elif(baseCMD == "cd"):
             message = constructMessage(f"cd {userRequest['fileRequested']}", "d")
             client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "put"):
-            handlePut(client, userRequest)
+            handlePut(client, userRequest, userInput)
             #return
-            if(not library.doesExist(userRequest['filePath'])):
-                print("Directory does not exist")
-            else:
-                if(userRequest['isRecursive'] or os.path.isfile(userRequest['filePath'])):
-                    if(os.path.isfile(userRequest['filePath'])):
-                        fileContents = str(library.fileToByte(userRequest['filePath']))
-                        message = constructMessage("touch " + userRequest['fileRequested'] + "; echo " + fileContents + "> " + userRequest['fileRequested'] ,'f')
-                    elif(os.path.isdir(userRequest['filePath'])):
-                        directory = library.directoryCopy(userRequest['filePath'])
-                        command = "cd " + userRequest['fileRequested'] +";" + command
-                        message  = constructMessage(command,'c')
-                    else:
-                        print("unexpected, inexplicable error \n")
-                    client.sendall(message.encode())
-                else:
-                    print("Needs to be Recursive with -R due to directory")
         elif(baseCMD == "get"):
             handleGET(userInput, userRequest['filePath'], userRequest['fileRequested'], client)
         else:
@@ -120,7 +104,7 @@ def handler(userInput, client):
 
 
 
-def handlePut(sock, userRequest):
+def handlePut(sock, userRequest, cmdString):
     if (not library.doesExist(userRequest['fileRequested'])):
         type = 'd'
         code = 404
@@ -134,7 +118,6 @@ def handlePut(sock, userRequest):
         type = 'd'
         code = 400
         print("Must use Recursive for directories")
-        print(output)
     elif (os.path.isfile(userRequest['fileRequested'])):
         type = 'f'
         code = 200
@@ -145,7 +128,7 @@ def handlePut(sock, userRequest):
         code = 500
         output = "Unknown error"
 
-    message = "put\n" + constructMessage(output, type)
+    message = "put\n" + cmdString+"\n"+constructMessage(cmdString, type)
     if not(code == 200):
         print (f"error: {code}")
         return

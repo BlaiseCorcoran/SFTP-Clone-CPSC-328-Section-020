@@ -67,13 +67,13 @@ def handleClient(sock, args):
             if clientMes == 0:
                 return
             clientCmd = (clientMes.split("\n"))[1]
-            print(clientCmd)
+            print("BASE: " + clientCmd)
             userRequest = library.replParse(str(clientCmd))
             baseCMD = userRequest["baseCMD"]
             print(baseCMD)
         # give the expected result
             if baseCMD == "pwd":
-                currRemoteDir = str(library.execBash("pwd"))
+                currRemoteDir = library.execBash("pwd")
                 message = constructMessage(currRemoteDir, "d", 200)
                 sock.send(message.encode())
             if baseCMD == "cd":
@@ -90,9 +90,9 @@ def handleClient(sock, args):
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
                     sock.send(message.encode())
             if baseCMD == "ls":
-                result = library.execBash("ls")
+                result = (library.execBash("ls"))
                 print("STRING IS: " + result)
-                message = constructMessage(result, "d", 200)
+                message = constructMessage(str(result), "d", 200)
                 print(message)
                 sock.send(message.encode())
             if baseCMD == "get":
@@ -107,31 +107,30 @@ def handleClient(sock, args):
         sock.close()
 
 def handlePut(socket, userRequest):
-    buffer = readSocket(socket)
     #if buffer.startswith("200"):
+    buffer = readSocket(socket)
     response = buffer.splitlines()  # Use splitlines for better newline handling
     #else:
     #    print("Error Occurred \n")
     #    print("Server Response:", buffer)
     #    return
-
-    if response[1] == "directory":
+    if response[2] == "directory":
         if not os.path.isdir(userRequest['filePath']):
             print("Error: User specified path does not exist.")
             return
-        command = "".join(response[2:])
+        command = "".join(response[3:])
         os.system("mkdir " + userRequest['fileRequest'] +";" + (f"cd {userRequest['filePath']}; "))
-        ret = os.system(command)
-        print("Command Execution Result:", ret)
-    elif response[1] == "file":
-        commandRESP = "".join(response[2:])
+        output = os.system(command)
+        print("Command Execution Result:", output)
+    elif response[2] == "file":
+        commandRESP = "".join(response[3:])
         if not os.path.exists(userRequest['fileRequest']):
             command = f"touch {userRequest['fileRequest']} && echo '{commandRESP}' > {userRequest['fileRequest']}"
-            ret = os.system(command)
+            output = os.system(command)
         else:
-            print("Error: File already exists and cannot be overwritten.")
+            output = ("Error: File already exists and cannot be overwritten.")
     elif response[1] == "data":
-        print("Received Data:", response[2])
+        print("Received Data:", response[0:])
         socket.sendall(b"200".encode())
 
     return

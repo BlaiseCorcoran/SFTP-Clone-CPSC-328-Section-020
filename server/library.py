@@ -165,8 +165,9 @@ def execBash(commandString):
     return: string - return of execution
     found https://docs.python.org/3/library/subprocess.html#subprocess.check_output
     """
-    ret = subprocess.check_output(commandString, shell=True, stderr=subprocess.STDOUT)
-    return str(ret.decode())
+    ret = subprocess.check_output(commandString, shell=True)
+    print(ret)
+    return ret.decode("utf-8")
 
 
 def directoryCopy(filePath):
