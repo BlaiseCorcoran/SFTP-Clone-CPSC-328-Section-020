@@ -169,6 +169,31 @@ def reallyRecvall(s, n):
             break
     return bytes
 
+
+def sigintHandler(signum, frame):
+    """
+    Description  : handles sigint
+    Parameters   : signum - the signal
+                   frame - the frame
+    """
+#    mainSocket_G[0].close()
+    print("shutting down new connections now. shutting down current connections in 30 seconds")
+#    time.sleep(1)
+#    for s in socketList_G:
+#        s.close()
+#    for p in processList_G:
+#        p.join(0.1)
+#        if p.exitcode == None:
+#            p.kill()
+    #
+    #
+    # DO STUFF TO EXIT GRACEFULLY
+    #
+    #
+    exit(1)
+    return
+
+
 def main():
     """
     Description : Runs the main routine of the server
@@ -180,6 +205,7 @@ def main():
 
     try:
         server = createServer(int(args.p))
+        mainSocket_G.append(server)
         while True:
             client, _ = server.accept()
 
@@ -188,6 +214,7 @@ def main():
                 multiprocessing.Process(target=handleClient, args=(client,))
             )
             processList_G[-1].run()
+            processList_G[-1].start()
 
             # fork a new process
     #            pid = os.fork()
