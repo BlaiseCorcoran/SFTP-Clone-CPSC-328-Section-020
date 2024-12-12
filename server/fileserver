@@ -62,6 +62,10 @@ def handleClient(sock, args):
             baseCMD = userRequest["baseCMD"]
             print(baseCMD)
         # give the expected result
+            if baseCMD == "exit":
+                print("Closing Connection")
+                sock.close()
+                os._exit(0)
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -76,7 +80,7 @@ def handleClient(sock, args):
                     os.chdir(changedRemoteDir)
                     message = constructMessage((userRequest["fileRequested"] + " is the current directory"), "d", 200)
                     sock.send(message.encode())
-                if not is_safe:
+                elif not is_safe:
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
                     sock.send(message.encode())
             if baseCMD == "ls":
@@ -216,11 +220,10 @@ def main():
             client, _ = server.accept()
 
             socketList_G.append(client)
-            processList_G.append(
-                multiprocessing.Process(target=handleClient, args=(client, args))
-            )
-            processList_G[-1].run()
-            processList_G[-1].start()
+            clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
+            processList_G.append(clientProcess)
+            clientProcess.run()
+            clientProcess.start()
 
             # fork a new process
     #            pid = os.fork()
@@ -235,9 +238,9 @@ def main():
     #                client.close()
     #                os._exit(0)
     except OSError as e:
-        print(e)
+        print(f"Error! {e}")
         os._exit(0)
-        print(f"Connection Error {e}")
+
 
 
 if __name__ == "__main__":

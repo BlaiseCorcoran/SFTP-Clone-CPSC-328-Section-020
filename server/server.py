@@ -62,6 +62,10 @@ def handleClient(sock, args):
             baseCMD = userRequest["baseCMD"]
             print(baseCMD)
         # give the expected result
+            if baseCMD == "exit":
+                print("Closing Connection")
+                sock.close()
+                os._exit(0)
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -234,9 +238,9 @@ def main():
     #                client.close()
     #                os._exit(0)
     except OSError as e:
-        print(e)
+        print(f"Error! {e}")
         os._exit(0)
-        print(f"Connection Error {e}")
+
 
 
 if __name__ == "__main__":
