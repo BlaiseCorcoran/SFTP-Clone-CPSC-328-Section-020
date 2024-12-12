@@ -120,7 +120,41 @@ def handler(userInput, client):
 
 
 
-#def handlePut(
+def handlePut(sock, userRequest):
+    if (not library.doesExist(userRequest['fileRequested'])):
+        type = 'd'
+        code = 404
+        print( f"{userRequest['fileRequested']}: Resource does not exist")
+    elif (os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']):
+        type = 'c'
+        code = 200
+        output = str(library.directoryCopy(userRequest['fileRequested']).decode())
+        print(output)
+    elif (os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']):
+        type = 'd'
+        code = 400
+        print("Must use Recursive for directories")
+        print(output)
+    elif (os.path.isfile(userRequest['fileRequested'])):
+        type = 'f'
+        code = 200
+        output = str(library.fileToByte(userRequest['fileRequested']).decode())
+        print(output)
+    else:
+        type = 'd'
+        code = 500
+        output = "Unknown error"
+
+    message = constructMessage(output, type, code)
+    if not(code == 200):
+        print (f"error: {code}")
+        return
+    sock.send(message.encode())
+    recvstr = readSocket(sock)
+    if (recvstr == "200"):
+        print("200 ok")
+    else:
+        print("error from server")
         
 
 
