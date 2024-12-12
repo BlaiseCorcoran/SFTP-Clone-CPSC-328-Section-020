@@ -145,7 +145,7 @@ def handlePut(sock, userRequest):
         code = 500
         output = "Unknown error"
 
-    message = "200\n" + constructMessage(output, type)
+    message = "put\n" + constructMessage(output, type)
     if not(code == 200):
         print (f"error: {code}")
         return
