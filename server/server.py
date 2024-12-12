@@ -109,15 +109,13 @@ def handleClient(sock, args):
         sock.close()
 
 def handlePut(socket, userRequest):
-    #request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
-    #client.sendall(request.encode())
     buffer = readSocket(client)
-    if buffer.startswith("200"):
-        response = buffer.splitlines()  # Use splitlines for better newline handling
-    else:
-        print("Error Occurred \n")
-        print("Server Response:", buffer)
-        return
+    #if buffer.startswith("200"):
+    response = buffer.splitlines()  # Use splitlines for better newline handling
+    #else:
+    #    print("Error Occurred \n")
+    #    print("Server Response:", buffer)
+    #    return
 
     if response[1] == "directory":
         if not os.path.isdir(userPath):
