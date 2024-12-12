@@ -164,12 +164,12 @@ def handleGET(clientCMD, userPath, dirToCopy, client):
         if not os.path.isdir(userPath):
             print("Error: User specified path does not exist.")
             return
-        command = "".join(response[2:])
+        command = "\n".join(response[2:])
         os.system("mkdir " + dirToCopy +";" + (f"cd {userPath}; "))
         ret = os.system(command)
         print("Command Execution Result:", ret)
     elif response[1] == "file":
-        commandRESP = "".join(response[2:])
+        commandRESP = "\n".join(response[2:])
         if not os.path.exists(userPath):
             command = f"touch {userPath} && echo '{commandRESP}' > {userPath}"
             ret = os.system(command)

@@ -217,7 +217,6 @@ def handle_shutdown(signal, frame):
     time.sleep(shutdownTimer)
     os._exit(0)
 
-
 def reallyRecvall(s, n):
     """
     Description : Ensures all the bytes have been received from the client
@@ -231,24 +230,6 @@ def reallyRecvall(s, n):
             break
     return bytes
 
-
-def sigintHandler(signum, frame):
-    """
-    Description  : handles sigint
-    Parameters   : signum - the signal
-                   frame - the frame
-    """
-    mainSocket_G.close()
-    print("shutting down new connections now. shutting down current connections in 30 seconds")
-    time.sleep(30)
-    for s in socketList_G:
-        s.close()
-    for p in processList_G:
-        p.join(0.1)
-        if p.exitcode == None:
-            p.kill()
-    exit(1)
-    return
 
 
 def main():
@@ -270,7 +251,10 @@ def main():
             pid = os.fork()
             # child
             if pid == 0:
+                socketList_G.append(client)
                 handleClient(client, args)
+                client.close()
+                os._exit(0)
             #parent
             else:
                 os.wait()

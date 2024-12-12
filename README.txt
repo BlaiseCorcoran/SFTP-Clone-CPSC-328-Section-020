@@ -44,8 +44,8 @@ All commands work properly
 
 Development Process Discussion:
 As the development process commenced it became clear that some changes to the protocol were going to be in order and some 
-functions from the library did not prove very useful. Sometimes the program felt like a deck of cards but as the process reached 
-the end it felt less like that. It also became obvious beatiful code is a luxury of simple programs.
+functions from the library did not prove very useful. Sometimes the program felt like a deck of cards. It also became obvious beatiful code is a luxury of simple programs, however I think a lot of problems could have been avoided by having an intermediary design phase where we could redesign based off problems we ran into
 
 
 Status:
+GET, ls, cd, pwd, local client commands, and graceful shut down all work fine. PUT and concurrent connections still have major issues and do not work in any function.

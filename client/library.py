@@ -185,7 +185,7 @@ def directoryCopy(filePath):
             filebytes = str(fileToByte(pathFile))
             fileString= filebytes.replace("'", "'\\''")  
             fileString= filebytes.replace("'", "'\\#'")
-            commandBuild += f"echo '{fileString}' > '{pathFile}';\n" 
+            commandBuild += f"echo {fileString} > {pathFile};\n" 
 
     return commandBuild
 
