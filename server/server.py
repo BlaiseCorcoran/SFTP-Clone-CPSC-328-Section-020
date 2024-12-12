@@ -7,6 +7,7 @@ import os
 import library
 import multiprocessing
 import subprocess
+import time
 import signal
 
 
@@ -135,6 +136,13 @@ def reallyRecvall(s, n):
 
 
 def sigintHandler(signum, frame):
+    mainSocket_G.close()
+    print("shutting down new connections now. shutting down current connections in 30 seconds")
+    time.sleep(30)
+    for s in socketList_G:
+        s.close()
+    for p in processList_G:
+        p.kill()
     #
     #
     # DO STUFF TO EXIT GRACEFULLY
@@ -159,11 +167,11 @@ def main():
         while True:
             client, _ = server.accept()
 
-            socketList.append(client)
-            processList.append(
+            socketList_G.append(client)
+            processList_G.append(
                 multiprocessing.Process(target=handleClient, args=(client,))
             )
-            processList[-1].run()
+            processList_G[-1].run()
 
             # fork a new process
     #            pid = os.fork()
@@ -184,6 +192,7 @@ def main():
 
 
 if __name__ == "__main__":
-    processList = []
-    socketList = []
+    processList_G = []
+    socketList_G = []
+    mainSocket_G
     main()
