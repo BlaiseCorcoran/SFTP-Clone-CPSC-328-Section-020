@@ -6,9 +6,7 @@ import socket
 import os
 import library
 import multiprocessing
-import subprocess
 import time
-import signal
 
 
 def parseArgs():
@@ -110,7 +108,7 @@ def handleGet(sock, userRequest):
     elif (os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']):
         type = 'c'
         code = 200
-        output = str(library.directoryCopy(userRequest['fileRequested']))
+        output = str(library.directoryCopy(userRequest['fileRequested']).decode())
         print(output)
     elif (os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']):
         type = 'd'
@@ -120,7 +118,7 @@ def handleGet(sock, userRequest):
     elif (os.path.isfile(userRequest['fileRequested'])):
         type = 'f'
         code = 200
-        output = str(library.fileToByte(userRequest['fileRequested']))
+        output = str(library.fileToByte(userRequest['fileRequested']).decode())
         print(output)
     else:
         type = 'd'
@@ -248,5 +246,5 @@ def main():
 if __name__ == "__main__":
     processList_G = []
     socketList_G = []
-    mainSocket_G = socket.fromfd(1, socket.AF_INET, socket.SOCK_STREAM)
+    mainSocket_G = None
     main()

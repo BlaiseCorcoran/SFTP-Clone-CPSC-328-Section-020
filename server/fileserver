@@ -6,9 +6,7 @@ import socket
 import os
 import library
 import multiprocessing
-import subprocess
 import time
-import signal
 
 
 def parseArgs():
@@ -100,26 +98,27 @@ def handleClient(sock, args):
         sock.close()
         return
 
-
+#input: socket, userRequest dictionary
+#purpose: handle get command from the client and serve the request
 def handleGet(sock, userRequest):
-    if not library.doesExist(userRequest['fileRequested']):
+    if (not library.doesExist(userRequest['fileRequested'])):
         type = 'd'
         code = 404
         output = f"{userRequest['fileRequested']}: Resource does not exist"
-    elif os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']:
+    elif (os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']):
         type = 'c'
         code = 200
-        output = str(library.directoryCopy(userRequest['fileRequested']))
+        output = str(library.directoryCopy(userRequest['fileRequested']).decode())
         print(output)
-    elif os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']:
+    elif (os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']):
         type = 'd'
         code = 400
         output = "Must use Recursive for directories"
         print(output)
-    elif os.path.isfile(userRequest['fileRequested']):
+    elif (os.path.isfile(userRequest['fileRequested'])):
         type = 'f'
         code = 200
-        output = str(library.fileToByte(userRequest['fileRequested']))
+        output = str(library.fileToByte(userRequest['fileRequested']).decode())
         print(output)
     else:
         type = 'd'
@@ -192,20 +191,15 @@ def sigintHandler(signum, frame):
     Parameters   : signum - the signal
                    frame - the frame
     """
-#    mainSocket_G[0].close()
+    mainSocket_G.close()
     print("shutting down new connections now. shutting down current connections in 30 seconds")
-#    time.sleep(1)
-#    for s in socketList_G:
-#        s.close()
-#    for p in processList_G:
-#        p.join(0.1)
-#        if p.exitcode == None:
-#            p.kill()
-    #
-    #
-    # DO STUFF TO EXIT GRACEFULLY
-    #
-    #
+    time.sleep(30)
+    for s in socketList_G:
+        s.close()
+    for p in processList_G:
+        p.join(0.1)
+        if p.exitcode == None:
+            p.kill()
     exit(1)
     return
 
@@ -221,15 +215,15 @@ def main():
 
     try:
         server = createServer(int(args.p))
-        mainSocket_G.append(server)
+        mainSocket_G=server
         while True:
             client, _ = server.accept()
 
             socketList_G.append(client)
             clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
             processList_G.append(clientProcess)
-            clientProcess.run()
             clientProcess.start()
+            clientProcess.run()
 
             # fork a new process
     #            pid = os.fork()
@@ -252,5 +246,5 @@ def main():
 if __name__ == "__main__":
     processList_G = []
     socketList_G = []
-    mainSocket_G = []
+    mainSocket_G = None
     main()
