@@ -3,6 +3,15 @@
 import os
 import subprocess
 
+"""
+Authors: Blaise Corcoran, Lou Wertman, Michael Colanene
+Due Date: December 12th, 4pm
+Class: CPSC-328_020
+Professor: Dr. Schwesinger
+Assignment: Final Project - SFTP Clone
+Purpose:  To provide a set of libraries to the client and to the server regarding file manipulation
+"""
+
 #library
 
 userCMD = {
@@ -14,17 +23,20 @@ userCMD = {
 
 
 
-#input: commands - string that user types in REPL
-#output: userCMD - dictionary with information about the command
 
-#name: replParse
-#purpose: parses the Read-Eval-Print loop user arguments.
-#when requesting or sending files the fileRequested value is used
-#when changing or listing directories the filePath value is used
-#for certain commands where the default dir is the current dir, instead
-#of being left blank the filePath will be './'
-#return value: returns a userCMD dictionary containing the values.
 def replParse(userCommandString):
+    """
+    input: commands - string that user types in REPL
+    output: userCMD - dictionary with information about the command
+
+    name: replParse
+    purpose: parses the Read-Eval-Print loop user arguments.
+    when requesting or sending files the fileRequested value is used
+    when changing or listing directories the filePath value is used
+    for certain commands where the default dir is the current dir, instead
+    of being left blank the filePath will be './'
+    return value: returns a userCMD dictionary containing the values.   
+    """
     retval = userCMD
     commandArgs = userCommandString.rsplit(" ")
     retval["baseCMD"] = commandArgs[0]
@@ -86,17 +98,23 @@ def replParse(userCommandString):
     except Exception as e:
         print(f"Error! {e}")
 
-# input: pathString - path to file
-# return: bool - true or false if the file exist, will return false if permission is denied
+
 def doesExist(pathString):
+    """
+    input: pathString - path to file
+    return: bool - true or false if the file exist, will return false if permission is denied
+    """
     if((os.path.isdir(pathString) or os.path.isfile(pathString)) and os.access(pathString, os.R_OK)):
         return True
     else:
         return False
 
-# input: pathString - file to covert to []byte
-# return:  []byte data of file
+
 def fileToByte(file):
+    """
+    input: pathString - file to covert to []byte
+    return:  []byte data of file
+    """
     if(os.path.isfile(file) == True):
         file = open(file, "r")
         fileContents = file.read()
@@ -107,23 +125,32 @@ def fileToByte(file):
         return False
     
 
-# input: path - path to return directory from
-# return: string - directory where the file resides
+
 def returnDirectory(path):
+    """
+    input: path - path to return directory from
+    return: string - directory where the file resides
+    """
     return os.path.dirname(path)
 
-# input: path - where to create directory
-# return: bool - success
+
 def createDirectory(path):
+    """
+    input: path - where to create directory
+    return: bool - success
+    """
     if(doesExist(path) == False):
         os.mkdir(path)
         return True
     else:
         return False
 
-# input: buffer - recieved buffer; filePath - where to create file
-# return: bool - success
+
 def bufferToFile(buffer, filePath):
+    """
+    input: buffer - recieved buffer; filePath - where to create file
+    return: bool - success
+    """
     if(not doesExist(filePath)):
         file = open("file", "wb")
         file.write(buffer)
@@ -131,16 +158,23 @@ def bufferToFile(buffer, filePath):
         return False
 
 
-# input: commandString - command to execute
-# return: string - return of execution
-# found https://docs.python.org/3/library/subprocess.html#subprocess.check_output
+
 def execBash(commandString):
+    """
+    input: commandString - command to execute
+    return: string - return of execution
+    found https://docs.python.org/3/library/subprocess.html#subprocess.check_output
+    """
     ret = subprocess.check_output(commandString, shell=True, stderr=subprocess.STDOUT)
     return str(ret.decode())
 
-# input: filePath; commandBuild string use empty string; right 
-# return: string - bash commands to copy directory
+
 def directoryCopy(filePath):
+    """
+    input: commandString - command to execute
+    return: string - return of execution
+    found https://docs.python.org/3/library/os.html 
+    """
     commandBuild = ""
     if(not doesExist):
         return NULL

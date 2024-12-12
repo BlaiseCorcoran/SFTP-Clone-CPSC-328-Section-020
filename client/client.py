@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-
+"""
+Authors: Blaise Corcoran, Lou Wertman, Michael Colanene
+Due Date: December 12th, 4pm
+Class: CPSC-328_020
+Professor: Dr. Schwesinger
+Assignment: Final Project - SFTP Clone
+Purpose:  To get give the user a REPL interface that sends commands to the server and recieves output from the server
+"""
 import argparse
 import os
 import library

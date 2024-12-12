@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+Authors: Blaise Corcoran, Lou Wertman, Michael Colanene
+Due Date: December 12th, 4pm
+Class: CPSC-328_020
+Professor: Dr. Schwesinger
+Assignment: Final Project - SFTP Clone
+Purpose: To create a concurrent server to respond to client requests for/to give files or directories
+"""
+
 # server
 import argparse
 import socket
@@ -98,9 +107,12 @@ def handleClient(sock, args):
         sock.close()
         return
 
-#input: socket, userRequest dictionary
-#purpose: handle get command from the client and serve the request
+
 def handleGet(sock, userRequest):
+    """
+    input: socket, userRequest dictionary
+    purpose: handle get command from the client and serve the request
+    """
     if (not library.doesExist(userRequest['fileRequested'])):
         type = 'd'
         code = 404
