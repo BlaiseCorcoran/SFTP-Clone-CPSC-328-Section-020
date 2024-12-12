@@ -28,6 +28,11 @@ def parseArgs():
 
 
 def readSocket(client):
+    """
+    Description  : Reads from the client
+    Parameters   : client - the client socket
+    Return Value : socketRead.decode() - the decoded message from the client
+    """
     socketRead = b""
     while True:
         buffer = client.recv(1024)
@@ -40,7 +45,7 @@ def readSocket(client):
     return str(socketRead.decode())
 
 
-def handleClient(sock):
+def handleClient(sock, args):
     """
     Description : Parses server commands from the client
     Parameters  : client - client socket
@@ -55,7 +60,12 @@ def handleClient(sock):
             print(clientCmd)
             userRequest = library.replParse(str(clientCmd))
             baseCMD = userRequest["baseCMD"]
-            # give the expected result
+            print(baseCMD)
+        # give the expected result
+            if baseCMD == "exit":
+                print("Closing Connection")
+                sock.close()
+                os._exit(0)
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -63,14 +73,14 @@ def handleClient(sock):
             if baseCMD == "cd":
                 changedRemoteDir = userRequest["fileRequested"]
                 #check if the user has access to the file
-                base_path = os.path.abspath(os.getcwd())
-                file_path = os.path.abspath(changedRemoteDir)
+                base_path = os.path.abspath(args.d)
+                file_path = os.path.abspath(args.d + changedRemoteDir)
                 is_safe = file_path.startswith(base_path)
                 if is_safe:
                     os.chdir(changedRemoteDir)
                     message = constructMessage((userRequest["fileRequested"] + " is the current directory"), "d", 200)
                     sock.send(message.encode())
-                if not is_safe:
+                elif not is_safe:
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
                     sock.send(message.encode())
             if baseCMD == "ls":
@@ -130,7 +140,7 @@ def constructMessage(message, type, errorCode):
     Parameters   : message - The message as a string 
                    type - the nature of the message
                    errorCode - the HTTP response code
-    Return Value : retMessage + message + "\r\n\r\n" - the constructed message
+    Return Value : The constructed message
     """
     retMessage = str(errorCode) + "\n"
 
@@ -210,11 +220,10 @@ def main():
             client, _ = server.accept()
 
             socketList_G.append(client)
-            processList_G.append(
-                multiprocessing.Process(target=handleClient, args=(client,))
-            )
-            processList_G[-1].run()
-            processList_G[-1].start()
+            clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
+            processList_G.append(clientProcess)
+            clientProcess.run()
+            clientProcess.start()
 
             # fork a new process
     #            pid = os.fork()
@@ -229,9 +238,9 @@ def main():
     #                client.close()
     #                os._exit(0)
     except OSError as e:
-        print(e)
+        print(f"Error! {e}")
         os._exit(0)
-        print(f"Connection Error {e}")
+
 
 
 if __name__ == "__main__":
