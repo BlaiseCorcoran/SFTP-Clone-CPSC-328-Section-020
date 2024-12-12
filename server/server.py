@@ -65,7 +65,7 @@ def handleClient(sock):
                 changedRemoteDir = userRequest["fileRequested"]
                 #check if the user has access to the file
                 base_path = os.path.abspath(os.getcwd())
-                file_path = os.path.abspath(os.getcwd() + get_file_path(changedRemoteDir))
+                file_path = os.path.abspath(changedRemoteDir)
                 is_safe = file_path.startswith(base_path)
                 if is_safe:
                     os.chdir(changedRemoteDir)
@@ -73,6 +73,7 @@ def handleClient(sock):
                     sock.send(message.encode())
                 if not is_safe:
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
+                    sock.send(message.encode())
             if baseCMD == "ls":
                 result = str(library.execBash("ls"))
                 message = constructMessage(result, "d", 200)
@@ -112,13 +113,25 @@ def handleClient(sock):
     except Exception as e:
         print(f"Error: {e}")
 
-def get_file_path(req):
+def get_dir_path(req):
+    """
+    Description  : gets the path of the requested directory
+    Parameters   : req - the requested directory
+    Return Value : the directory path
+    """
     s = req.split()
     if len(s) >= 3:
         return s[1]
     return ""
 
 def constructMessage(message, type, errorCode):
+    """
+    Description  : Constructs the message to be sent to the client
+    Parameters   : message - The message as a string 
+                   type - the nature of the message
+                   errorCode - the HTTP response code
+    Return Value : retMessage + message + "\r\n\r\n" - the constructed message
+    """
     retMessage = str(errorCode) + "\n"
 
     if type == "f":
@@ -158,6 +171,11 @@ def reallyRecvall(s, n):
 
 
 def sigintHandler(signum, frame):
+    """
+    Description  : handles sigint
+    Parameters   : signum - the signal
+                   frame - the frame
+    """
     mainSocket_G.close()
     print("shutting down new connections now. shutting down current connections in 30 seconds")
     time.sleep(30)
@@ -216,5 +234,5 @@ def main():
 if __name__ == "__main__":
     processList_G = []
     socketList_G = []
-    mainSocket_G
+    mainSocket_G = []
     main()
