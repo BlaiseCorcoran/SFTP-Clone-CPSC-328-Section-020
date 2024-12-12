@@ -25,9 +25,7 @@ def parseArgs():
 
     return args
 
-#name:replLoop 
-#input: client - client socket
-#purpose: to provide the ability to use the user to type commands in the prompt
+
 def replLOOP(client):
     """
     Description : Provides the ability of the user to type commands into the prompt
@@ -40,9 +38,6 @@ def replLOOP(client):
         handler(userInput, client)
 
 
-#name: handler
-#input: user input string from the REPL
-#purpose: nasty long fuction to process the logic of the user argument and package data to send to the server
 def handler(userInput, client):
     """
     Description : Handles the user input commands and gives the expected result
@@ -75,21 +70,21 @@ def handler(userInput, client):
             print(f"Success Code: + {bool(success)}")
         elif(baseCMD == "mkdir"):
             message = constructMessage(f"mkdir {userRequest['filePath']}", 'd')
-            print(message)
             client.sendall(message.encode())
-            print(readSocket(client))
+            parsedResp = (readSocket(client)).split('\n')
+            print("".join(parsedResp[2:]))
         elif(baseCMD == "ls"):
             message = constructMessage("ls",'d')
             client.sendall(message.encode())
-            print(readSocket(client))
+            parsedResp = (readSocket(client)).split('\n')
+            print("".join(parsedResp[2:]))
         elif(baseCMD=="pwd"):
             message = constructMessage("pwd", "d")
-            print(message)
             client.sendall(message.encode())
-            print(readSocket(client))
+            parsedResp = (readSocket(client)).split('\n')
+            print("".join(parsedResp[2:]))
         elif(baseCMD == "cd"):
             message = constructMessage(f"cd {userRequest['fileRequested']}", "d")
-            print(message)
             client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "put"):
@@ -122,12 +117,7 @@ def handler(userInput, client):
         
 
 
-        
-#name: handleGET 
-#input: filePath - of server
-#       userPath - of client
-#       client - socket
-#purpose: handle GET command, handles reciving commands from server
+
 def handleGET(clientCMD, userPath, dirToCopy, client):
     """
     Description : Handles GET commands and receiving commands from the server
@@ -151,23 +141,19 @@ def handleGET(clientCMD, userPath, dirToCopy, client):
             return
         command = "".join(response[2:])
         os.system("mkdir " + dirToCopy +";" + (f"cd {userPath}; "))
-        print("Constructed Command:", command)
         ret = os.system(command)
         print("Command Execution Result:", ret)
     elif response[1] == "file":
+        commandRESP = "".join(response[2:])
         if not os.path.exists(userPath):
-            command = f"touch {userPath} && echo '{response[2]}' > {userPath}"
+            command = f"touch {userPath} && echo '{commandRESP}' > {userPath}"
             ret = os.system(command)
-            print("Command Execution Result:", ret)
         else:
             print("Error: File already exists and cannot be overwritten.")
     elif response[1] == "data":
         print("Received Data:", response[2])
 
-#name: readSocket
-#input: client - socket
-#returns: str - socketRead - what was read from said socket
-#purpose:reads data from a socket until "\r\n\r\n" 
+
 def readSocket(client):
     """
     Description  : Reads from the client
