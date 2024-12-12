@@ -107,6 +107,38 @@ def handleClient(sock, args):
         sock.close()
         return
 
+def handlePut(socket, userRequest):
+    #request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
+    #client.sendall(request.encode())
+    buffer = readSocket(client)
+    if buffer.startswith("200"):
+        response = buffer.splitlines()  # Use splitlines for better newline handling
+    else:
+        print("Error Occurred \n")
+        print("Server Response:", buffer)
+        return
+
+    if response[1] == "directory":
+        if not os.path.isdir(userPath):
+            print("Error: User specified path does not exist.")
+            return
+        command = "".join(response[2:])
+        os.system("mkdir " + dirToCopy +";" + (f"cd {userPath}; "))
+        ret = os.system(command)
+        print("Command Execution Result:", ret)
+    elif response[1] == "file":
+        commandRESP = "".join(response[2:])
+        if not os.path.exists(userPath):
+            command = f"touch {userPath} && echo '{commandRESP}' > {userPath}"
+            ret = os.system(command)
+        else:
+            print("Error: File already exists and cannot be overwritten.")
+    elif response[1] == "data":
+        print("Received Data:", response[2])
+        socket.sendall(b"200".encode())
+
+    return
+
 
 def handleGet(sock, userRequest):
     """
