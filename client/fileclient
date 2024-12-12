@@ -93,6 +93,8 @@ def handler(userInput, client):
             client.sendall(message.encode())
             print(readSocket(client))
         elif(baseCMD == "put"):
+            handlePut(client, userRequest)
+            #return
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
             else:
@@ -118,8 +120,43 @@ def handler(userInput, client):
 
 
 
-#def handlePut(
-        
+def handlePut(sock, userRequest):
+    if (not library.doesExist(userRequest['fileRequested'])):
+        type = 'd'
+        code = 404
+        print( f"{userRequest['fileRequested']}: Resource does not exist")
+    elif (os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']):
+        type = 'c'
+        code = 200
+        output = library.directoryCopy(userRequest['fileRequested'])
+        print(output)
+    elif (os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']):
+        type = 'd'
+        code = 400
+        print("Must use Recursive for directories")
+        print(output)
+    elif (os.path.isfile(userRequest['fileRequested'])):
+        type = 'f'
+        code = 200
+        output = str(library.fileToByte(userRequest['fileRequested']).decode())
+        print(output)
+    else:
+        type = 'd'
+        code = 500
+        output = "Unknown error"
+
+    message = "put\n" + constructMessage(output, type)
+    if not(code == 200):
+        print (f"error: {code}")
+        return
+    sock.sendall(message.encode())
+    recvstr = readSocket(sock)
+    if (recvstr == "200"):
+        print("200 ok")
+    else:
+        print("error from server")
+
+
 
 
 

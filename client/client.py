@@ -94,7 +94,7 @@ def handler(userInput, client):
             print(readSocket(client))
         elif(baseCMD == "put"):
             handlePut(client, userRequest)
-            return
+            #return
             if(not library.doesExist(userRequest['filePath'])):
                 print("Directory does not exist")
             else:
@@ -128,7 +128,7 @@ def handlePut(sock, userRequest):
     elif (os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']):
         type = 'c'
         code = 200
-        output = str(library.directoryCopy(userRequest['fileRequested']).decode())
+        output = library.directoryCopy(userRequest['fileRequested'])
         print(output)
     elif (os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']):
         type = 'd'

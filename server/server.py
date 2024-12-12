@@ -14,11 +14,9 @@ import argparse
 import socket
 import os
 import library
-import multiprocessing
 import time
-import shutil
 import signal
-
+import shutil
 
 def parseArgs():
     """
@@ -109,7 +107,7 @@ def handleClient(sock, args):
         sock.close()
 
 def handlePut(socket, userRequest):
-    buffer = readSocket(client)
+    buffer = readSocket(socket)
     #if buffer.startswith("200"):
     response = buffer.splitlines()  # Use splitlines for better newline handling
     #else:
@@ -118,17 +116,17 @@ def handlePut(socket, userRequest):
     #    return
 
     if response[1] == "directory":
-        if not os.path.isdir(userPath):
+        if not os.path.isdir(userRequest['filePath']):
             print("Error: User specified path does not exist.")
             return
         command = "".join(response[2:])
-        os.system("mkdir " + dirToCopy +";" + (f"cd {userPath}; "))
+        os.system("mkdir " + userRequest['fileRequest'] +";" + (f"cd {userRequest['filePath']}; "))
         ret = os.system(command)
         print("Command Execution Result:", ret)
     elif response[1] == "file":
         commandRESP = "".join(response[2:])
-        if not os.path.exists(userPath):
-            command = f"touch {userPath} && echo '{commandRESP}' > {userPath}"
+        if not os.path.exists(userRequest['fileRequest']):
+            command = f"touch {userRequest['fileRequest']} && echo '{commandRESP}' > {userRequest['fileRequest']}"
             ret = os.system(command)
         else:
             print("Error: File already exists and cannot be overwritten.")
@@ -266,14 +264,9 @@ def main():
 
     try:
         server = createServer(int(args.p))
-        #mainSocket_G=server
+
         while True:
             client, _ = server.accept()
-            #socketList_G.append(client)
-            #clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
-            #processList_G.append(clientProcess)
-            #clientProcess.start()
-            #clientProcess.run()
             # fork a new process
             pid = os.fork()
             # child
