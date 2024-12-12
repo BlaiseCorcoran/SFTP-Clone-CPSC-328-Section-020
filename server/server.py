@@ -76,7 +76,7 @@ def handleClient(sock, args):
                     os.chdir(changedRemoteDir)
                     message = constructMessage((userRequest["fileRequested"] + " is the current directory"), "d", 200)
                     sock.send(message.encode())
-                if not is_safe:
+                elif not is_safe:
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
                     sock.send(message.encode())
             if baseCMD == "ls":
@@ -216,7 +216,7 @@ def main():
             client, _ = server.accept()
 
             socketList_G.append(client)
-            clientProcess = multiprocessing.Process(target = handleCleint, args=(client, args))
+            clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
             processList_G.append(clientProcess)
             clientProcess.run()
             clientProcess.start()
