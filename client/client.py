@@ -197,6 +197,27 @@ def readSocket(client):
     return str(socketRead.decode())[:-4]
         
 
+#probably unused function. ignore
+def minigolf(socket, userRequest, userMesg):
+    if not library.doesExist(userRequest['fileRequested']):
+        print ("directory does not exist")
+        return
+    elif os.path.isdir(userRequest['fileRequested']):
+        print("Use on files, not directories!")
+        return
+        #implement recursive
+    sendFile = library.fileToByte(userRequest['fileRequested'])
+    _, fileName = os.path.split(userMesg)
+    fileName+='\n'
+    messageSend =constructMessage( "put\n" + fileName  + str(sendFile), 'f')
+    #message separated by \n looks like:
+    #File, Put, filename, all of the information in, the , file goes, after
+    
+    socket.sendall(messageSend.encode())
+    
+    return
+
+
 
 #purpose: print the massive help string, just in a seperate function for neatness
 def printHelp():
