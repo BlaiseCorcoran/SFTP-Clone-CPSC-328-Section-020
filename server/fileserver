@@ -60,7 +60,8 @@ def handleClient(sock, args):
             print(clientCmd)
             userRequest = library.replParse(str(clientCmd))
             baseCMD = userRequest["baseCMD"]
-            # give the expected result
+            print(baseCMD)
+        # give the expected result
             if baseCMD == "exit":
                 print("Closing Connection")
                 sock.close()

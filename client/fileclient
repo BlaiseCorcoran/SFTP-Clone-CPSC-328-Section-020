@@ -128,32 +128,30 @@ def handleGET(clientCMD, userPath, client):
     request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
     client.send(request.encode())
     buffer = readSocket(client)
-    if(buffer.startswith("200")):
-        response = buffer.split("\n")
+    if buffer.startswith("200"):
+        response = buffer.splitlines()  # Use splitlines for better newline handling
     else:
-        print("Error Occured \n")
-        print("server sends:" + buffer)
+        print("Error Occurred \n")
+        print("Server Response:", buffer)
         return
 
-    if(response[1] == "directory"):
-        if(library.doesExist(userPath) == False):
-            print("User specified path fails to exist")
+    if response[1] == "directory":
+        if not os.path.isdir(userPath):
+            print("Error: User specified path does not exist.")
             return
-        command = "cd "+ userPath +"; "
-        for i in response[2:]:
-            command += i.decode()
-        print(command)
+        command = f"cd {userPath} && " + "".join(response[2:])
+        print("Constructed Command:", command)
         ret = os.system(command)
-        print(ret)
-    elif(response[1] == "file"):
-        if(not library.doesExist(userPath)):
-            command = "touch " + userPath + "; echo " + str(response[2]) + ">" + userPath
+        print("Command Execution Result:", ret)
+    elif response[1] == "file":
+        if not os.path.exists(userPath):
+            command = f"touch {userPath} && echo '{response[2]}' > {userPath}"
             ret = os.system(command)
-            print(ret)
+            print("Command Execution Result:", ret)
         else:
-            print("File cannot be overwritten")
-    elif(response[1] == "data"):
-        print(response[2])
+            print("Error: File already exists and cannot be overwritten.")
+    elif response[1] == "data":
+        print("Received Data:", response[2])
 
 #name: readSocket
 #input: client - socket
