@@ -151,8 +151,8 @@ def directoryCopy(filePath):
         for name in files:
             pathFile = os.path.join(root, name)
             filebytes = str(fileToByte(pathFile).decode())
-            fileString= filebytes.replace("'", r"\'")  # Escape single quotes for shell
-            fileString= filebytes.replace("'", r"\#")  # Escape single quotes for shell
+            fileString= filebytes.replace("'", r"\'")  
+            fileString= filebytes.replace("'", r"\#") 
             commandBuild += f"echo '{fileString}' > {pathFile};"
 
     return commandBuild

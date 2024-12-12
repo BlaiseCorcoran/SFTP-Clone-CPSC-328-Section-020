@@ -107,7 +107,7 @@ def handler(userInput, client):
                 else:
                     print("Needs to be Recursive with -R due to directory")
         elif(baseCMD == "get"):
-            handleGET(userInput, userRequest['filePath'], client)
+            handleGET(userInput, userRequest['filePath'], userRequest['fileRequested'], client)
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
@@ -118,7 +118,7 @@ def handler(userInput, client):
 #       userPath - of client
 #       client - socket
 #purpose: handle GET command, handles reciving commands from server
-def handleGET(clientCMD, userPath, client):
+def handleGET(clientCMD, userPath, dirToCopy, client):
     """
     Description : Handles GET commands and receiving commands from the server
     Parameters  : clientCMD - the client command
@@ -139,7 +139,8 @@ def handleGET(clientCMD, userPath, client):
         if not os.path.isdir(userPath):
             print("Error: User specified path does not exist.")
             return
-        command = f"cd {userPath} && " + "".join(response[2:])
+        command = "".join(response[2:])
+        os.system("mkdir " + dirToCopy +";" + (f"cd {userPath}; "))
         print("Constructed Command:", command)
         ret = os.system(command)
         print("Command Execution Result:", ret)
