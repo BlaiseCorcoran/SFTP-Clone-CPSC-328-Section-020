@@ -141,7 +141,7 @@ def constructMessage(message, type, errorCode):
     elif type == "c":
         retMessage += "directory\n"
 
-    return retMessage + message + "\r\n\r\n"
+    return retMessage + message + "\n\r\n\r\n"
 
 
 def createServer(port):

@@ -141,7 +141,7 @@ def constructMessage(message, type, errorCode):
     elif type == "c":
         retMessage += "directory\n"
 
-    return retMessage + message + "\r\n\r\n"
+    return retMessage + message + "\n\r\n\r\n"
 
 
 def createServer(port):
@@ -169,29 +169,6 @@ def reallyRecvall(s, n):
             break
     return bytes
 
-
-def sigintHandler(signum, frame):
-    """
-    Description  : handles sigint
-    Parameters   : signum - the signal
-                   frame - the frame
-    """
-    mainSocket_G.close()
-    print("shutting down new connections now. shutting down current connections in 30 seconds")
-    time.sleep(30)
-    for s in socketList_G:
-        s.close()
-    for p in processList_G:
-        p.kill()
-    #
-    #
-    # DO STUFF TO EXIT GRACEFULLY
-    #
-    #
-    exit(1)
-    return
-
-
 def main():
     """
     Description : Runs the main routine of the server
@@ -200,7 +177,6 @@ def main():
     library.userCMD["filePath"] = args.d
     os.chdir(library.userCMD["filePath"])
 
-    signal.signal(signal.SIGINT, sigintHandler)
 
     try:
         server = createServer(int(args.p))

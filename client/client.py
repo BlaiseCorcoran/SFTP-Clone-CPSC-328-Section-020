@@ -120,12 +120,12 @@ def handleGET(clientCMD, userPath, client):
         if(library.doesExist(userPath) == False):
             print("User specified path fails to exist")
             return
-        command = "cd "+ userPath +";" + str(response[2])
+        command = "cd "+ userPath +"; " + response[2]
         ret = os.system(command)
         print(ret)
     elif(response[1] == "file"):
         if(not library.doesExist(userPath)):
-            command = "touch " + userPath + ";echo " + str(response[2]) + ">" + userPath
+            command = "touch " + userPath + "; echo " + str(response[2]) + ">" + userPath
             ret = os.system(command)
             print(ret)
         else:
