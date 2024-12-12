@@ -9,6 +9,10 @@ import socket
 #name: parseArgs()
 #purpose: parse cmd line arguments
 def parseArgs():
+    """
+    Description     : Parses the command line arguments
+    Return Value    : args - the command line arguments
+    """
     #initialize
     parser = argparse.ArgumentParser(prog='client.py', description='Specify host and port to connect to', add_help=False) 
 
@@ -25,6 +29,10 @@ def parseArgs():
 #input: client - client socket
 #purpose: to provide the ability to use the user to type commands in the prompt
 def replLOOP(client):
+    """
+    Description : Provides the ability of the user to type commands into the prompt
+    Parameters  : client - client socket
+    """
     running = True
     print("Welcome to SFTP Clone\n")
     while running:
@@ -36,6 +44,11 @@ def replLOOP(client):
 #input: user input string from the REPL
 #purpose: nasty long fuction to process the logic of the user argument and package data to send to the server
 def handler(userInput, client):
+    """
+    Description : Handles the user input commands and gives the expected result
+    Parameters  : userInput - user input via the command line
+                  client - the client socket
+    """
     userRequest = library.replParse(str(userInput))
     baseCMD = userRequest['baseCMD']
     try:
@@ -106,6 +119,12 @@ def handler(userInput, client):
 #       client - socket
 #purpose: handle GET command, handles reciving commands from server
 def handleGET(clientCMD, userPath, client):
+    """
+    Description : Handles GET commands and receiving commands from the server
+    Parameters  : clientCMD - the client command
+                  userPath - the user provided path
+                  client - the client socket
+    """
     request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
     client.send(request.encode())
     buffer = readSocket(client)
@@ -138,6 +157,11 @@ def handleGET(clientCMD, userPath, client):
 #returns: str - socketRead - what was read from said socket
 #purpose:reads data from a socket until "\r\n\r\n" 
 def readSocket(client):
+    """
+    Description  : Reads from the client
+    Parameters   : client - the client socket
+    Return Value : socketRead.decode() - the decoded message from the client
+    """
     socketRead = b""
     while True:
         buffer = client.recv(1024)
@@ -153,6 +177,9 @@ def readSocket(client):
 
 #purpose: print the massive help string, just in a seperate function for neatness
 def printHelp():
+    """
+    Description: Prints the help message
+    """
     helpString = """
     exit – quit the application.
 
@@ -190,6 +217,12 @@ def printHelp():
 #        'f' = file, 'd' = data, 'c' - directory
 # return: returnString - string to send to server
 def constructMessage(mainMessage, messageType):
+    """
+    Description  : Constructs a message to be sent to the server
+    Parameters   : mainMessage - the main message
+                   messageType - the nature of the message
+    Return Value : returnString - the constructed message
+    """
     if messageType == 'f':
         returnString = "File\n"
     elif messageType == 'd':
@@ -219,6 +252,9 @@ def reallyRecvall(s, n):
 
 
 def main():
+    """
+    Description: Runs the main routine
+    """
     args = parseArgs()
 
     try:
