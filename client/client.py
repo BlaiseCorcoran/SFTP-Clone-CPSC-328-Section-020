@@ -149,12 +149,13 @@ def handlePut(sock, userRequest):
     if not(code == 200):
         print (f"error: {code}")
         return
-    sock.send(message.encode())
+    sock.sendall(message.encode())
     recvstr = readSocket(sock)
     if (recvstr == "200"):
         print("200 ok")
     else:
         print("error from server")
+
 
 
 
