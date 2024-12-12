@@ -212,7 +212,7 @@ def createServer(port):
 def handle_shutdown(signal, frame):
     shutdownTimer = 5
     print(f"\nServer shutting down in {shutdownTimer} seconds...")
-    for pid in client_pids:
+    for pid in socketList_G:
         os.kill(pid, signal.SIGTERM)  # Terminate child processes
     time.sleep(shutdownTimer)
     os._exit(0)
@@ -270,9 +270,7 @@ def main():
             pid = os.fork()
             # child
             if pid == 0:
-                server.close()
                 handleClient(client, args)
-                os._exit(0)
             #parent
             else:
                 os.wait()
