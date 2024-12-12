@@ -216,11 +216,10 @@ def main():
             client, _ = server.accept()
 
             socketList_G.append(client)
-            processList_G.append(
-                multiprocessing.Process(target=handleClient, args=(client, args))
-            )
-            processList_G[-1].run()
-            processList_G[-1].start()
+            clientProcess = multiprocessing.Process(target = handleCleint, args=(client, args))
+            processList_G.append(clientProcess)
+            clientProcess.run()
+            clientProcess.start()
 
             # fork a new process
     #            pid = os.fork()
