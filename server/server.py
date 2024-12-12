@@ -99,6 +99,8 @@ def handleClient(sock, args):
                 sock.send(message.encode())
             if baseCMD == "get":
                 handleGet(sock, userRequest)
+            if baseCMD == "put":
+                handlePut(sock, userRequest)
     except Exception as e:
         print(f"Error: {e}")
         sock.close()
@@ -106,11 +108,10 @@ def handleClient(sock, args):
     finally:
         sock.close()
 
-""""
 def handlePut(socket, userRequest):
     #request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
     #client.sendall(request.encode())
-    buffer = readSocket(socket)
+    buffer = readSocket(client)
     if buffer.startswith("200"):
         response = buffer.splitlines()  # Use splitlines for better newline handling
     else:
@@ -138,7 +139,6 @@ def handlePut(socket, userRequest):
         socket.sendall(b"200".encode())
 
     return
-"""
 
 def handleGet(sock, userRequest):
     """
