@@ -193,20 +193,15 @@ def sigintHandler(signum, frame):
     Parameters   : signum - the signal
                    frame - the frame
     """
-#    mainSocket_G[0].close()
+    mainSocket_G.close()
     print("shutting down new connections now. shutting down current connections in 30 seconds")
-#    time.sleep(1)
-#    for s in socketList_G:
-#        s.close()
-#    for p in processList_G:
-#        p.join(0.1)
-#        if p.exitcode == None:
-#            p.kill()
-    #
-    #
-    # DO STUFF TO EXIT GRACEFULLY
-    #
-    #
+    time.sleep(30)
+    for s in socketList_G:
+        s.close()
+    for p in processList_G:
+        p.join(0.1)
+        if p.exitcode == None:
+            p.kill()
     exit(1)
     return
 
@@ -222,15 +217,15 @@ def main():
 
     try:
         server = createServer(int(args.p))
-        mainSocket_G.append(server)
+        mainSocket_G=server
         while True:
             client, _ = server.accept()
 
             socketList_G.append(client)
             clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
             processList_G.append(clientProcess)
-            clientProcess.run()
             clientProcess.start()
+            clientProcess.run()
 
             # fork a new process
     #            pid = os.fork()
@@ -253,5 +248,5 @@ def main():
 if __name__ == "__main__":
     processList_G = []
     socketList_G = []
-    mainSocket_G = []
+    mainSocket_G = socket.fromfd(1, socket.AF_INET, socket.SOCK_STREAM)
     main()
