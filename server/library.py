@@ -89,7 +89,7 @@ def replParse(userCommandString):
 # input: pathString - path to file
 # return: bool - true or false if the file exist, will return false if permission is denied
 def doesExist(pathString):
-    if(os.path.isdir(pathString) and os.access(pathString, os.R_OK)):
+    if((os.path.isdir(pathString) or os.path.isfile(pathString)) and os.access(pathString, os.R_OK)):
         return True
     else:
         return False
@@ -134,8 +134,9 @@ def bufferToFile(buffer, filePath):
 # input: commandString - command to execute
 # return: string - return of execution
 def execBash(commandString):
-    ret = subprocess.run(commandString, shell=True, capture_output=True, text=True, check=True) 
+    ret = subprocess.run(commandString, shell=True, check=True)
     return str(ret.stdout)
+
 
 # input: filePath; commandBuild string use empty string; right 
 # return: string - bash commands to copy directory
@@ -149,7 +150,7 @@ def directoryCopy(filePath):
             commandBuild += f"mkdir -p '{dirPath}';\n" 
         for name in files:
             pathFile = os.path.join(root, name)
-            filebytes = str(fileToByte(pathFile))
+            filebytes = str(fileToByte(pathFile).decode())
             fileString= filebytes.replace("'", "'\\''")  # Escape single quotes for shell
             commandBuild += f"echo '{fileString}' > '{pathFile}';\n" 
 

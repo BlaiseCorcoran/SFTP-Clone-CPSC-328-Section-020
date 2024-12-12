@@ -69,9 +69,31 @@ def handleClient(sock):
                 print(message.encode())
                 sock.send(message.encode())
             if baseCMD == "ls":
-                result = library.execBash("ls")
+                result = str(library.execBash("ls"))
                 message = constructMessage(result, "d", 200)
                 print(message)
+                sock.send(message.encode())
+            if baseCMD == "get":
+                if(library.doesExist(userRequest['fileRequested']) == False):
+                    type='d'
+                    code=404
+                    output = userRequest['fileRequested']+": Resource does not exist"
+                elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == True):
+                        type='c'
+                        code = 200
+                        output = str(library.directoryCopy(userRequest['fileRequested']))
+                        print(output)
+                elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == False):
+                    type='d'
+                    code=400
+                    output = "Must use Recursive for directories"
+                    print(output)
+                elif(os.path.isfile(userRequest['fileRequested'])):
+                    type = 'f'
+                    code=200
+                    output = str(library.fileToByte(userRequest['fileRequested']))
+                    print(output)
+                message = constructMessage(output, type, code)
                 sock.send(message.encode())
             if baseCMD == "mkdir":
                 success = library.createDirectory(userRequest["filePath"])

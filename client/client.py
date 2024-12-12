@@ -89,11 +89,7 @@ def handler(userInput, client):
                     print("Needs to be Recursive with -R due to directory")
 
         elif(baseCMD == "get"):
-            if(not library.doesExist(userRequest['filePath'])):
-                print("Directory does not exist")
-            else:
-                handleGET(userRequest['filePath'], userRequest['fileRequested'], client)
-
+                handleGET(userInput, userRequest['filePath'], client)
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
@@ -104,22 +100,33 @@ def handler(userInput, client):
 #       userPath - of client
 #       client - socket
 #purpose: handle GET command, handles reciving commands from server
-def handleGET(filePath, userPath, client):
-    request = "GET " + filePath + "\r\n\r\n"
+def handleGET(clientCMD, userPath, client):
+    request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
     client.send(request.encode())
     buffer = readSocket(client)
-    print("server sends:" + buffer)
     if(buffer.startswith("200")):
-        response = buffer.Split("\n")
+        response = buffer.split("\n")
     else:
         print("Error Occured \n")
+        print("server sends:" + buffer)
         return
 
-    if(response[3]=="file\n"):
-        library.execBash(command)
-    if(response[3] == "Directory\n"):
-        command = "cd "+ userPath +";" + response[2]
-        library.execBash(command)
+    if(response[1] == "directory"):
+        if(library.doesExist(userPath) == False):
+            print("User specified path fails to exist")
+            return
+        command = "cd "+ userPath +";" + str(response[2])
+        ret = os.system(command)
+        print(ret)
+    elif(response[1] == "file"):
+        if(not library.doesExist(userPath)):
+            command = "touch " + userPath + ";echo " + str(response[2]) + ">" + userPath
+            ret = os.system(command)
+            print(ret)
+        else:
+            print("File cannot be overwritten")
+    elif(response[1] == "data"):
+        print(response[2])
 
 #name: readSocket
 #input: client - socket
