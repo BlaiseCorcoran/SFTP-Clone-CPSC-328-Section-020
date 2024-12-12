@@ -94,44 +94,40 @@ def handleClient(sock, args):
                 print(message)
                 sock.send(message.encode())
             if baseCMD == "get":
-                if(library.doesExist(userRequest['fileRequested']) == False):
-                    type='d'
-                    code=404
-                    output = userRequest['fileRequested']+": Resource does not exist"
-                elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == True):
-                        type='c'
-                        code = 200
-                        output = str(library.directoryCopy(userRequest['fileRequested']))
-                        print(output)
-                elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == False):
-                    type='d'
-                    code=400
-                    output = "Must use Recursive for directories"
-                    print(output)
-                elif(os.path.isfile(userRequest['fileRequested'])):
-                    type = 'f'
-                    code=200
-                    output = str(library.fileToByte(userRequest['fileRequested']))
-                    print(output)
-                message = constructMessage(output, type, code)
-                sock.send(message.encode())
-            if baseCMD == "put":
-                pass
-            
-            if baseCMD == "mkdir":
-                success = str(library.createDirectory(userRequest["filePath"]))
-                success = f"Success Code: {success}"
-                if success:
-                    errorCode = 200
-                else:
-                    errorCode = 404
-                success = constructMessage(success, "c", errorCode)
-                sock.send(success.encode())
+                handleGet(sock, userRequest)
     except Exception as e:
         print(f"Error: {e}")
         sock.close()
         return
 
+
+def handleGet(sock, userRequest):
+    if not library.doesExist(userRequest['fileRequested']):
+        type = 'd'
+        code = 404
+        output = f"{userRequest['fileRequested']}: Resource does not exist"
+    elif os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive']:
+        type = 'c'
+        code = 200
+        output = str(library.directoryCopy(userRequest['fileRequested']))
+        print(output)
+    elif os.path.isdir(userRequest['fileRequested']) and not userRequest['isRecursive']:
+        type = 'd'
+        code = 400
+        output = "Must use Recursive for directories"
+        print(output)
+    elif os.path.isfile(userRequest['fileRequested']):
+        type = 'f'
+        code = 200
+        output = str(library.fileToByte(userRequest['fileRequested']))
+        print(output)
+    else:
+        type = 'd'
+        code = 500
+        output = "Unknown error"
+
+    message = constructMessage(output, type, code)
+    sock.send(message.encode())
 
 def get_dir_path(req):
     """
