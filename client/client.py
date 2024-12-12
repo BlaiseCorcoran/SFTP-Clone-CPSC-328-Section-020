@@ -213,7 +213,11 @@ def main():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
             client.connect((args.h, int(args.p))) #connect to the servers
-            msgRecv = client.recv(10)
+            bytesrecv = 0
+            msgRecv = b''
+            while not bytesrecv == 10:
+                msgRecv += client.recv(10)
+                bytesrecv = len(msgRecv)
             print(msgRecv.decode())
             replLOOP(client) #enter the repl loop
             client.close() #close the client when done
