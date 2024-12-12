@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+Authors: Blaise Corcoran, Lou Wertman, Michael Colanene
+Due Date: December 12th, 4pm
+Class: CPSC-328_020
+Professor: Dr. Schwesinger
+Assignment: Final Project - SFTP Clone
+Purpose: To create a concurrent server to respond to client requests for/to give files or directories
+"""
+
 # server
 import argparse
 import socket
@@ -7,6 +16,8 @@ import os
 import library
 import multiprocessing
 import time
+import shutil
+import signal
 
 
 def parseArgs():
@@ -36,8 +47,7 @@ def readSocket(client):
         buffer = client.recv(1024)
         if not buffer:
             print("client closed connection")
-            client.close()
-            return 0
+            break
         socketRead += buffer
         if str(socketRead.decode()).endswith("\r\n\r\n"):
             break
@@ -64,10 +74,6 @@ def handleClient(sock, args):
             baseCMD = userRequest["baseCMD"]
             print(baseCMD)
         # give the expected result
-            if baseCMD == "exit":
-                print("Closing Connection")
-                sock.close()
-                return
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -97,10 +103,48 @@ def handleClient(sock, args):
         print(f"Error: {e}")
         sock.close()
         return
+    finally:
+        sock.close()
 
-#input: socket, userRequest dictionary
-#purpose: handle get command from the client and serve the request
+""""
+def handlePut(socket, userRequest):
+    #request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
+    #client.sendall(request.encode())
+    buffer = readSocket(socket)
+    if buffer.startswith("200"):
+        response = buffer.splitlines()  # Use splitlines for better newline handling
+    else:
+        print("Error Occurred \n")
+        print("Server Response:", buffer)
+        return
+
+    if response[1] == "directory":
+        if not os.path.isdir(userPath):
+            print("Error: User specified path does not exist.")
+            return
+        command = "".join(response[2:])
+        os.system("mkdir " + dirToCopy +";" + (f"cd {userPath}; "))
+        ret = os.system(command)
+        print("Command Execution Result:", ret)
+    elif response[1] == "file":
+        commandRESP = "".join(response[2:])
+        if not os.path.exists(userPath):
+            command = f"touch {userPath} && echo '{commandRESP}' > {userPath}"
+            ret = os.system(command)
+        else:
+            print("Error: File already exists and cannot be overwritten.")
+    elif response[1] == "data":
+        print("Received Data:", response[2])
+        socket.sendall(b"200".encode())
+
+    return
+"""
+
 def handleGet(sock, userRequest):
+    """
+    input: socket, userRequest dictionary
+    purpose: handle get command from the client and serve the request
+    """
     if (not library.doesExist(userRequest['fileRequested'])):
         type = 'd'
         code = 404
@@ -170,6 +214,14 @@ def createServer(port):
     server.listen()
     return server
 
+def handle_shutdown(signal, frame):
+    shutdownTimer = 5
+    print(f"\nServer shutting down in {shutdownTimer} seconds...")
+    for pid in client_pids:
+        os.kill(pid, signal.SIGTERM)  # Terminate child processes
+    time.sleep(shutdownTimer)
+    os._exit(0)
+
 
 def reallyRecvall(s, n):
     """
@@ -212,31 +264,29 @@ def main():
     library.userCMD["filePath"] = args.d
     os.chdir(library.userCMD["filePath"])
 
+    signal.signal(signal.SIGINT, handle_shutdown)
 
     try:
         server = createServer(int(args.p))
-        mainSocket_G=server
+        #mainSocket_G=server
         while True:
             client, _ = server.accept()
-
-            socketList_G.append(client)
-            clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
-            processList_G.append(clientProcess)
-            clientProcess.start()
-            clientProcess.run()
-
+            #socketList_G.append(client)
+            #clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
+            #processList_G.append(clientProcess)
+            #clientProcess.start()
+            #clientProcess.run()
             # fork a new process
-    #            pid = os.fork()
-    #
-    # child
-    #           if pid == 0:
-    #                server.close()
-    #                handleClient(client)
-    #            #parent
-    #            else:
-    #                os.wait()
-    #                client.close()
-    #                os._exit(0)
+            pid = os.fork()
+            # child
+            if pid == 0:
+                server.close()
+                handleClient(client, args)
+                os._exit(0)
+            #parent
+            else:
+                os.wait()
+                client.close()
     except OSError as e:
         print(f"Error! {e}")
         os._exit(0)

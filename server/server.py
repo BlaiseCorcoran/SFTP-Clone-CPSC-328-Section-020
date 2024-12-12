@@ -16,6 +16,8 @@ import os
 import library
 import multiprocessing
 import time
+import shutil
+import signal
 
 
 def parseArgs():
@@ -45,8 +47,7 @@ def readSocket(client):
         buffer = client.recv(1024)
         if not buffer:
             print("client closed connection")
-            client.close()
-            return 0
+            break
         socketRead += buffer
         if str(socketRead.decode()).endswith("\r\n\r\n"):
             break
@@ -73,10 +74,6 @@ def handleClient(sock, args):
             baseCMD = userRequest["baseCMD"]
             print(baseCMD)
         # give the expected result
-            if baseCMD == "exit":
-                print("Closing Connection")
-                sock.close()
-                return
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -106,11 +103,14 @@ def handleClient(sock, args):
         print(f"Error: {e}")
         sock.close()
         return
+    finally:
+        sock.close()
 
+""""
 def handlePut(socket, userRequest):
     #request = "GET\n" + clientCMD + "\n" + "\r\n\r\n"
     #client.sendall(request.encode())
-    buffer = readSocket(client)
+    buffer = readSocket(socket)
     if buffer.startswith("200"):
         response = buffer.splitlines()  # Use splitlines for better newline handling
     else:
@@ -138,7 +138,7 @@ def handlePut(socket, userRequest):
         socket.sendall(b"200".encode())
 
     return
-
+"""
 
 def handleGet(sock, userRequest):
     """
@@ -214,6 +214,14 @@ def createServer(port):
     server.listen()
     return server
 
+def handle_shutdown(signal, frame):
+    shutdownTimer = 5
+    print(f"\nServer shutting down in {shutdownTimer} seconds...")
+    for pid in client_pids:
+        os.kill(pid, signal.SIGTERM)  # Terminate child processes
+    time.sleep(shutdownTimer)
+    os._exit(0)
+
 
 def reallyRecvall(s, n):
     """
@@ -256,31 +264,29 @@ def main():
     library.userCMD["filePath"] = args.d
     os.chdir(library.userCMD["filePath"])
 
+    signal.signal(signal.SIGINT, handle_shutdown)
 
     try:
         server = createServer(int(args.p))
-        mainSocket_G=server
+        #mainSocket_G=server
         while True:
             client, _ = server.accept()
-
-            socketList_G.append(client)
-            clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
-            processList_G.append(clientProcess)
-            clientProcess.start()
-            clientProcess.run()
-
+            #socketList_G.append(client)
+            #clientProcess = multiprocessing.Process(target = handleClient, args=(client, args))
+            #processList_G.append(clientProcess)
+            #clientProcess.start()
+            #clientProcess.run()
             # fork a new process
-    #            pid = os.fork()
-    #
-    # child
-    #           if pid == 0:
-    #                server.close()
-    #                handleClient(client)
-    #            #parent
-    #            else:
-    #                os.wait()
-    #                client.close()
-    #                os._exit(0)
+            pid = os.fork()
+            # child
+            if pid == 0:
+                server.close()
+                handleClient(client, args)
+                os._exit(0)
+            #parent
+            else:
+                os.wait()
+                client.close()
     except OSError as e:
         print(f"Error! {e}")
         os._exit(0)

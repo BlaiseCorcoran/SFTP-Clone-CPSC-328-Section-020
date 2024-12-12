@@ -43,7 +43,9 @@ All commands work properly
 [ADD ANY MORE YOU THINK OF]
 
 Development Process Discussion:
-    As the development process commenced it became clear that some changes to the protocol were going to be in order and some functions from the library did not prove very useful. Sometimes the program felt like a deck of cards but as the process reached the end it felt less like that. It also became obvious beatiful code is a luxury of simple programs.
+As the development process commenced it became clear that some changes to the protocol were going to be in order and some 
+functions from the library did not prove very useful. Sometimes the program felt like a deck of cards but as the process reached 
+the end it felt less like that. It also became obvious beatiful code is a luxury of simple programs.
 
 
 Status:

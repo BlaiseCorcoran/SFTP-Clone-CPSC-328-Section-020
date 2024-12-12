@@ -58,8 +58,6 @@ def handler(userInput, client):
     baseCMD = userRequest['baseCMD']
     try:
         if(baseCMD == "exit"):
-            message = constructMessage("exit", "d")
-            client.sendall(message.encode())
             client.close()
             os._exit(0)
         elif(baseCMD == "help"):
