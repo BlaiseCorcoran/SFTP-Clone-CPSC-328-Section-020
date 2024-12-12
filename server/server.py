@@ -55,8 +55,7 @@ def handleClient(sock):
             print(clientCmd)
             userRequest = library.replParse(str(clientCmd))
             baseCMD = userRequest["baseCMD"]
-            print(baseCMD)
-        # give the expected result
+            # give the expected result
             if baseCMD == "pwd":
                 currRemoteDir = str(library.execBash("pwd"))
                 message = constructMessage(currRemoteDir, "d", 200)
@@ -103,7 +102,7 @@ def handleClient(sock):
                 message = constructMessage(output, type, code)
                 sock.send(message.encode())
             if baseCMD == "mkdir":
-                success = library.createDirectory(userRequest["filePath"])
+                success = str(library.createDirectory(userRequest["filePath"]))
                 success = f"Success Code: {success}"
                 if success:
                     errorCode = 200

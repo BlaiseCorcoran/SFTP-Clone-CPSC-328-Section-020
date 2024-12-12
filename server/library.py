@@ -64,7 +64,7 @@ def replParse(userCommandString):
         elif baseCommand == "lpwd" :
             return retval
         elif baseCommand == "ls" :
-            if len(commandArgs) > 1 :
+            if len(commandArgs) > 1:
                 retval["filePath"] = commandArgs[1]
                 return retval
             else :

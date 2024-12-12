@@ -91,10 +91,7 @@ def handler(userInput, client):
                 else:
                     print("Needs to be Recursive with -R due to directory")
         elif(baseCMD == "get"):
-            if(not library.doesExist(userRequest['filePath'])):
-                print("Directory does not exist")
-            else:
-                handleGET(userRequest['filePath'], userRequest['fileRequested'], client)
+            handleGET(userInput, userRequest['filePath'], client)
         else:
             print("Command Not Found! Enter 'help' For More Info")
     except OSError as e:
