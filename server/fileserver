@@ -58,8 +58,8 @@ def handleClient(sock):
             print(baseCMD)
         # give the expected result
             if baseCMD == "pwd":
-                currRemoteDir = library.execBash("pwd")
-                message = constructMessage((currRemoteDir + " "), "d", 200)
+                currRemoteDir = str(library.execBash("pwd"))
+                message = constructMessage(currRemoteDir, "d", 200)
                 sock.send(message.encode())
             if baseCMD == "cd":
                 changedRemoteDir = userRequest["fileRequested"]
@@ -75,7 +75,8 @@ def handleClient(sock):
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
                     sock.send(message.encode())
             if baseCMD == "ls":
-                result = str(library.execBash("ls"))
+                result = library.execBash("ls")
+                print("STRING IS: " + result)
                 message = constructMessage(result, "d", 200)
                 print(message)
                 sock.send(message.encode())
@@ -87,7 +88,7 @@ def handleClient(sock):
                 elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == True):
                         type='c'
                         code = 200
-                        output = str(library.directoryCopy(userRequest['fileRequested']))
+                        output = library.directoryCopy(userRequest['fileRequested'])
                         print(output)
                 elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == False):
                     type='d'
@@ -141,7 +142,7 @@ def constructMessage(message, type, errorCode):
     elif type == "c":
         retMessage += "directory\n"
 
-    return retMessage + message + "\n\r\n\r\n"
+    return (retMessage + message + "\n\r\n\r\n")
 
 
 def createServer(port):
@@ -176,13 +177,15 @@ def sigintHandler(signum, frame):
     Parameters   : signum - the signal
                    frame - the frame
     """
-    mainSocket_G.close()
+#    mainSocket_G[0].close()
     print("shutting down new connections now. shutting down current connections in 30 seconds")
-    time.sleep(30)
-    for s in socketList_G:
-        s.close()
-    for p in processList_G:
-        p.kill()
+#    time.sleep(1)
+#    for s in socketList_G:
+#        s.close()
+#    for p in processList_G:
+#        p.join(0.1)
+#        if p.exitcode == None:
+#            p.kill()
     #
     #
     # DO STUFF TO EXIT GRACEFULLY
@@ -200,10 +203,10 @@ def main():
     library.userCMD["filePath"] = args.d
     os.chdir(library.userCMD["filePath"])
 
-    signal.signal(signal.SIGINT, sigintHandler)
 
     try:
         server = createServer(int(args.p))
+        mainSocket_G.append(server)
         while True:
             client, _ = server.accept()
 
@@ -212,6 +215,7 @@ def main():
                 multiprocessing.Process(target=handleClient, args=(client,))
             )
             processList_G[-1].run()
+            processList_G[-1].start()
 
             # fork a new process
     #            pid = os.fork()

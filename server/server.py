@@ -58,8 +58,8 @@ def handleClient(sock):
             print(baseCMD)
         # give the expected result
             if baseCMD == "pwd":
-                currRemoteDir = library.execBash("pwd")
-                message = constructMessage((currRemoteDir + " "), "d", 200)
+                currRemoteDir = str(library.execBash("pwd"))
+                message = constructMessage(currRemoteDir, "d", 200)
                 sock.send(message.encode())
             if baseCMD == "cd":
                 changedRemoteDir = userRequest["fileRequested"]
@@ -75,7 +75,8 @@ def handleClient(sock):
                     message = constructMessage(("You do not have Access to this directory"), "d", 403)
                     sock.send(message.encode())
             if baseCMD == "ls":
-                result = str(library.execBash("ls"))
+                result = library.execBash("ls")
+                print("STRING IS: " + result)
                 message = constructMessage(result, "d", 200)
                 print(message)
                 sock.send(message.encode())
@@ -87,7 +88,7 @@ def handleClient(sock):
                 elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == True):
                         type='c'
                         code = 200
-                        output = str(library.directoryCopy(userRequest['fileRequested']))
+                        output = library.directoryCopy(userRequest['fileRequested'])
                         print(output)
                 elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == False):
                     type='d'
@@ -141,7 +142,7 @@ def constructMessage(message, type, errorCode):
     elif type == "c":
         retMessage += "directory\n"
 
-    return retMessage + message + "\n\r\n\r\n"
+    return (retMessage + message + "\n\r\n\r\n")
 
 
 def createServer(port):
