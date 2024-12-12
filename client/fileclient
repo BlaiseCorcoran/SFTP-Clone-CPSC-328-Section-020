@@ -117,7 +117,10 @@ def handleGET(clientCMD, userPath, client):
         if(library.doesExist(userPath) == False):
             print("User specified path fails to exist")
             return
-        command = "cd "+ userPath +"; " + response[2]
+        command = "cd "+ userPath +"; "
+        for i in response[2:]:
+            command += i.decode()
+        print(command)
         ret = os.system(command)
         print(ret)
     elif(response[1] == "file"):

@@ -147,12 +147,12 @@ def directoryCopy(filePath):
     for root, dirs, files in os.walk(filePath):
         for name in dirs:
             dirPath = os.path.join(root, name)
-            commandBuild += f"mkdir -p '{dirPath}';\n" 
+            commandBuild += f"mkdir -p '{dirPath}';" 
         for name in files:
             pathFile = os.path.join(root, name)
             filebytes = str(fileToByte(pathFile).decode())
-            fileString= filebytes.replace("'", "'\\''")  # Escape single quotes for shell
-            commandBuild += f"echo '{fileString}' > '{pathFile}';\n" 
+            fileString= filebytes.replace("'", r"\'")  # Escape single quotes for shell
+            commandBuild += f"echo '{fileString}' > {pathFile};"
 
     return commandBuild
 

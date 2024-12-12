@@ -87,7 +87,7 @@ def handleClient(sock):
                 elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == True):
                         type='c'
                         code = 200
-                        output = library.directoryCopy(userRequest['fileRequested'])
+                        output = str(library.directoryCopy(userRequest['fileRequested']))
                         print(output)
                 elif(os.path.isdir(userRequest['fileRequested']) and userRequest['isRecursive'] == False):
                     type='d'
@@ -135,11 +135,11 @@ def constructMessage(message, type, errorCode):
     retMessage = str(errorCode) + "\n"
 
     if type == "f":
-        retMessage += "file\n"
+        retMessage += "file\r\n"
     elif type == "d":
-        retMessage += "data\n"
+        retMessage += "data\r\n"
     elif type == "c":
-        retMessage += "directory\n"
+        retMessage += "directory\r\n"
 
     return (retMessage + message + "\n\r\n\r\n")
 
