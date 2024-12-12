@@ -106,6 +106,28 @@ def handleClient(sock, args):
     finally:
         sock.close()
 
+#probably unused function, ignore
+def minigolf(socket, userRequest):
+    #print(userRequest)
+    splitToLines = userRequest.splitlines()
+    #print(splitToLines)
+    filename = userRequest[2]
+    echoin = ""
+    print (1)
+    for s in userRequest[3:]:
+        echoin += s
+    print(2)
+    command = f"touch {filename}"
+    #print(command)
+    os.system(command)
+    print(3)
+    print(filename)
+    fileto = open(filename, mode = 'w')
+    fileto.write(echoin)
+    fileto.close
+    
+    return
+
 def handlePut(socket, userRequest):
     #if buffer.startswith("200"):
     buffer = readSocket(socket)
